@@ -1,0 +1,5 @@
+(kicad_sch (version 20211014) (generator "Codex")
+  (paper "A4")
+  (title_block (title "Power_In") (rev "C.4b")
+    (comment 1 "LM5069-1 hot-swap; Rsense 3.0 mΩ; CdV/dt 33 nF; TVS SMBJ33A"))
+)

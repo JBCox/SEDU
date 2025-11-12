@@ -1,0 +1,5 @@
+(kicad_sch (version 20211014) (generator "Codex")
+  (paper "A4")
+  (title_block (title "Motor_Driver") (rev "C.4b")
+    (comment 1 "DRV8353RS; 6×60 V FETs; 3×2 mΩ shunts; CPL-CPH 47 nF; VCP/VGLS/DVDD 1 µF"))
+)

@@ -1,0 +1,9 @@
+(kicad_sch (version 20211014) (generator "Codex")
+  (paper "A4")
+  (title_block
+    (title "SEDU_PCB Top")
+    (company "SEDU")
+    (rev "C.4b")
+    (comment 1 "SSOT: docs/SEDU_Single_PCB_Parity_Corrected_RevC4a_Final.md")
+  )
+)

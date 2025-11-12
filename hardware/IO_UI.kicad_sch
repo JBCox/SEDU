@@ -1,0 +1,5 @@
+(kicad_sch (version 20211014) (generator "Codex")
+  (paper "A4")
+  (title_block (title "IO_UI") (rev "C.4b")
+    (comment 1 "Button ladder R19=10k,R20=100k,R21=5k,R11=10k,C19=100nF; START/STOP dig"))
+)

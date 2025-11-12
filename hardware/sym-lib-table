@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name "SEDU")(type "KiCad")(uri "${KIPRJMOD}/lib/SEDU_Placeholders.kicad_sym")(options "")(descr "SEDU placeholder symbols"))
+)

@@ -1,0 +1,5 @@
+(kicad_sch (version 20211014) (generator "Codex")
+  (paper "A4")
+  (title_block (title "MCU") (rev "C.4b")
+    (comment 1 "ESP32-S3-WROOM-1; USB on GPIO19/20; keep GPIO-JTAG disabled"))
+)

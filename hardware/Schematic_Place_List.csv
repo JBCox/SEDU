@@ -1,0 +1,90 @@
+Sheet,Ref,Value/MPN,Notes
+Power_In,U6,LM5069-1,Hot-swap controller
+Power_In,RS_IN,3.0mΩ 4-terminal ≥3W 1%,Sense resistor (Kelvin)
+Power_In,CDVDT,33nF ≥50V X7R,Gate dv/dt cap (start value)
+Power_In,TVS1,SMBJ33A,Input surge clamp
+Power_In,QREV,N-MOSFET 60V 10–20mΩ,Reverse input FET (if used)
+Power_In,RUV_TOP,140kΩ 1%,UV divider top (≈19.0 V on)
+Power_In,RUV_BOT,10.0kΩ 1%,UV divider bottom
+Power_In,ROV_TOP,221kΩ 1%,OV divider top (≈29.2 V trip)
+Power_In,ROV_BOT,10.0kΩ 1%,OV divider bottom
+Power_In,NT_PGND_LGND,NetTie_2,Star ground tie near LM5069 sense
+
+Bucks,U4,LMR33630AF,24→5V buck
+Bucks,L4,10µH ≥4A sat,5V buck inductor (8–10µH ok)
+Bucks,C4x,22µF 10V X7R ×4,5V buck output
+Bucks,C4IN,10µF 50V X7R + 220nF,5V buck input
+Bucks,U5,TPS62133,5→3.3V buck
+Bucks,L5,2.2µH ≥3.8A sat,3.3V buck inductor
+Bucks,C5x,22µF 6.3V X7R ×2,3.3V buck output
+
+USB_Prog,U7,TPS22919,USB load switch
+USB_Prog,U8,TLV75533,USB-only 3.3V LDO
+USB_Prog,R_CC1,5.1kΩ,USB-C UFP CC1 pulldown to GND
+USB_Prog,R_CC2,5.1kΩ,USB-C UFP CC2 pulldown to GND
+USB_Prog,ESD_CC,ESD 2-line (DNI),CC1/CC2 ESD near connector
+
+MCU,U1,ESP32-S3-WROOM-1-N16R8,MCU module (USB on GPIO19/20)
+MCU,ESDUSB,USB ESD array,Near USB-C
+MCU,R_CSA_U,56–100Ω,Series at GPIO5 (CSA U)
+MCU,C_CSA_U,470pF,Shunt to GND at GPIO5
+MCU,R_CSA_V,56–100Ω,Series at GPIO6 (CSA V)
+MCU,C_CSA_V,470pF,Shunt to GND at GPIO6
+MCU,R_CSA_W,56–100Ω,Series at GPIO7 (CSA W)
+MCU,C_CSA_W,470pF,Shunt to GND at GPIO7
+MCU,R_BAT_SER,1–4.7kΩ,Series at GPIO1 (BAT_ADC)
+MCU,C_BAT_AA,0.1µF,Shunt to GND at GPIO1
+MCU,R_IPROPI_SER,100–220Ω,Series at GPIO2 (IPROPI)
+MCU,C_IPROPI_AA,10–100nF,Shunt to GND at GPIO2
+
+Motor_Driver,U2,DRV8353RS,3-phase gate driver
+Motor_Driver,Q1,Q2,Q3,Q4,Q5,Q6 60V MOSFETs,SuperSO8 class
+Motor_Driver,RG_U_HS,10Ω,Gate resistor HS U (place at gate)
+Motor_Driver,RG_U_LS,10Ω,Gate resistor LS U (place at gate)
+Motor_Driver,RG_V_HS,10Ω,Gate resistor HS V (place at gate)
+Motor_Driver,RG_V_LS,10Ω,Gate resistor LS V (place at gate)
+Motor_Driver,RG_W_HS,10Ω,Gate resistor HS W (place at gate)
+Motor_Driver,RG_W_LS,10Ω,Gate resistor LS W (place at gate)
+Motor_Driver,RS_U,2mΩ 2512 1%,Phase U shunt (Kelvin)
+Motor_Driver,RS_V,2mΩ 2512 1%,Phase V shunt (Kelvin)
+Motor_Driver,RS_W,2mΩ 2512 1%,Phase W shunt (Kelvin)
+Motor_Driver,C_CPLCPH,47nF ≥100V X7R,DRV8353 pump cap
+Motor_Driver,C_VCP,1µF ≥16V X7R,DRV8353 VCP
+Motor_Driver,C_VGLS,1µF ≥16V X7R,DRV8353 VGLS
+Motor_Driver,C_DVDD,1µF ≥6.3V X7R,DRV8353 DVDD
+Motor_Driver,RSN_U,10Ω (DNI),RC snubber series (U→PGND)
+Motor_Driver,CSN_U,1–4.7nF (DNI),RC snubber cap (U→PGND)
+Motor_Driver,RSN_V,10Ω (DNI),RC snubber series (V→PGND)
+Motor_Driver,CSN_V,1–4.7nF (DNI),RC snubber cap (V→PGND)
+Motor_Driver,RSN_W,10Ω (DNI),RC snubber series (W→PGND)
+Motor_Driver,CSN_W,1–4.7nF (DNI),RC snubber cap (W→PGND)
+
+Actuator,U3,DRV8873-Q1,Actuator H-bridge PH/EN
+Actuator,R_ILIM,1.58kΩ 1%,≈3.3A Ilim
+Actuator,R_IPROPI,1.00kΩ 1%,IPROPI scaling
+Actuator,TVS2,SMBJ33A,Actuator supply clamp
+
+LCD_Connector,J_LCD,JST-GH 8p,3V3 GND SCK MOSI CS_LCD DC RST LEDK
+LCD_Connector,R_SCK,22–33Ω,SCK series at MCU
+LCD_Connector,R_MOSI,22–33Ω,MOSI series at MCU
+LCD_Connector,Q_LED,N-FET SOT-23,Backlight sink (or resistor only)
+LCD_Connector,FB_LED,600Ω@100MHz (DNI),LEDK series bead near J_LCD
+
+IO_UI,J_UI,JST-GH 8p,3V3 GND BTN_SENSE START STOP BUZZER LED1 LED2
+IO_UI,ESD_UI,ESD 4-line array,Place near J_UI pins; short GND return
+IO_UI,R_START_SER,100Ω,Series at START_DIG near J_UI
+IO_UI,R_STOP_SER,100Ω,Series at STOP_NC_DIG near J_UI
+IO_UI,R19,10kΩ,Pull-up
+IO_UI,R20,100kΩ,Aux pull-up
+IO_UI,R21,5kΩ,Start leg (NO)
+IO_UI,R11,10kΩ,Stop leg (NC)
+IO_UI,C19,100nF,RC at ladder node
+IO_UI,R_BTN_SER,100–220Ω,Series at BTN_SENSE to MCU
+
+TestPads,TP_3V3,Test pad,3.3 V rail
+TestPads,TP_5V,Test pad,5 V rail
+TestPads,TP_24V,Test pad,VBAT_PROT
+TestPads,TP_BTN,Test pad,BTN_SENSE
+TestPads,TP_IPROPI,Test pad,IPROPI_ADC
+TestPads,TP_RX,Test pad,UART_RX
+TestPads,TP_TX,Test pad,UART_TX

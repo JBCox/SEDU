@@ -1,0 +1,5 @@
+(kicad_sch (version 20211014) (generator "Codex")
+  (paper "A4")
+  (title_block (title "LCD_Connector") (rev "C.4b")
+    (comment 1 "GC9A01 SPI; SCK=GPIO18; MOSI=GPIO17; CS_LCD=GPIO16; LEDK 10–20 mA"))
+)

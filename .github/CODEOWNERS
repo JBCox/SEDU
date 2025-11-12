@@ -1,0 +1,17 @@
+# CODEOWNERS — require review on sensitive areas
+# Replace @your-github-handle with your actual GitHub username(s) or team(s).
+
+# Default owner for everything
+* @your-github-handle
+
+# Documentation and specs
+docs/** @your-github-handle
+README_FOR_CODEX.md @your-github-handle
+INIT.md @your-github-handle
+
+# Hardware project files
+hardware/** @your-github-handle
+
+# Firmware and scripts
+firmware/** @your-github-handle
+scripts/** @your-github-handle

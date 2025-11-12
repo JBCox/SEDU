@@ -1,0 +1,4 @@
+(fp_lib_table
+  (lib (name "SEDU")(type "KiCad")(uri "${KIPRJMOD}/lib/SEDU.pretty")(options "")(descr "SEDU local footprints"))
+)
+

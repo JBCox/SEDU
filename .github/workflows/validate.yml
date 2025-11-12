@@ -1,0 +1,29 @@
+name: Validate Docs & Pins
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install ripgrep
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+      - name: Check pin map
+        run: python3 scripts/check_pinmap.py
+      - name: Check docs index
+        run: python3 scripts/check_docs_index.py
+      - name: Check net labels coverage
+        run: python3 scripts/check_netlabels_vs_pins.py
+      - name: Check critical value locks
+        run: python3 scripts/check_value_locks.py
+      - name: Policy greps
+        run: |
+          rg -n "TLV757|VESC fallback|PPM|PWM header" -S || true
+          rg -n "TLV75533|TPS22919" -S docs/ Component_Report.md || true
+          rg -n "GC9A01|MISO NC|CS_LCD|GPIO16" -S docs/ New\\ Single\\ Board\\ Idea.md Component_Report.md || true

@@ -1,0 +1,5 @@
+(kicad_sch (version 20211014) (generator "Codex")
+  (paper "A4")
+  (title_block (title "USB_Prog") (rev "C.4b")
+    (comment 1 "TPS22919 → TLV75533 (USB-only 3.3 V); radios OFF; never power tool"))
+)

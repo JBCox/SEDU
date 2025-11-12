@@ -1,0 +1,5 @@
+(kicad_sch (version 20211014) (generator "Codex")
+  (paper "A4")
+  (title_block (title "Actuator") (rev "C.4b")
+    (comment 1 "DRV8873-Q1 PH/EN; VM=24 V; R_ILIM=1.58 kΩ; R_IPROPI=1.00 kΩ; IPROPI→GPIO2"))
+)

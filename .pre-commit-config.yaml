@@ -1,0 +1,33 @@
+repos:
+  - repo: local
+    hooks:
+      - id: check-pinmap
+        name: Check pin map (SSOT ↔ firmware)
+        entry: python3 scripts/check_pinmap.py
+        language: system
+        pass_filenames: false
+      - id: check-docs-index
+        name: Check docs index registry
+        entry: python3 scripts/check_docs_index.py
+        language: system
+        pass_filenames: false
+      - id: check-netlabels
+        name: Check net labels coverage
+        entry: python3 scripts/check_netlabels_vs_pins.py
+        language: system
+        pass_filenames: false
+      - id: check-value-locks
+        name: Check critical value locks
+        entry: python3 scripts/check_value_locks.py
+        language: system
+        pass_filenames: false
+      - id: check-policy-strings
+        name: Check banned policy strings
+        entry: python3 scripts/check_policy_strings.py
+        language: system
+        pass_filenames: false
+      - id: check-ladder-bands
+        name: Check ladder bands (SSOT ↔ firmware)
+        entry: python3 scripts/check_ladder_bands.py
+        language: system
+        pass_filenames: false
