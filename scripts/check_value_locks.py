@@ -5,7 +5,7 @@ Checks (hard-coded for Rev C.4x):
 - LM5069 variant is '-1' in: SSOT, INIT, Component_Report, README_FOR_CODEX
 - DRV8873 locks: R_ILIM = 1.58 kΩ, R_IPROPI = 1.00 kΩ present in: SSOT, INIT, Component_Report, README_FOR_CODEX
 - Battery divider: RUV_TOP = 140kΩ, RUV_BOT = 10.0kΩ in BOM matches SSOT and firmware calibration
-- Board size '80 × 60 mm' present in: SSOT or Mounting, and INIT
+- Board size '75 × 55 mm' present in: SSOT or Mounting, and INIT
 
 Exit codes: 0 = OK, 1 = mismatches found
 """
@@ -44,8 +44,8 @@ def main() -> int:
     pats_lm5069 = [r"LM5069-1", r"latch\s*[-\u2010-\u2015]?\s*off"]
     # DRV8873 locks (allow 1.0 or 1.00 formatting)
     pats_drv = [r"R[_ ]?ILIM\s*=\s*1\.58\s*k", r"R[_ ]?IPROPI\s*=\s*1\.0+\s*k"]
-    # Board size
-    pats_size = [r"80\s*[×x]\s*60\s*mm"]
+    # Board size (optimized from 80×60mm)
+    pats_size = [r"75\s*[×x]\s*55\s*mm"]
 
     for label, path in FILES.items():
         missing = present(path, pats_lm5069 + pats_drv)
@@ -97,10 +97,10 @@ def main() -> int:
         mount = ROOT / "hardware" / "Mounting_And_Envelope.md"
         ssot_ok = not present(mount, pats_size)
     if not ssot_ok:
-        print("[locks] Board size 80×60 mm missing in SSOT/Mounting")
+        print("[locks] Board size 75×55 mm missing in SSOT/Mounting")
         rc = 1
     if not init_ok:
-        print("[locks] Board size 80×60 mm missing in INIT.md")
+        print("[locks] Board size 75×55 mm missing in INIT.md")
         rc = 1
 
     if rc == 0:

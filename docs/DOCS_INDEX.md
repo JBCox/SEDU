@@ -25,7 +25,7 @@
 - `hardware/SEDU_PCB.kicad_pro` — KiCad project file.
 - `hardware/SEDU_PCB.kicad_sch` — top schematic (add hierarchical sheets here).
 - `hardware/Power_In.kicad_sch` — LM5069-1 / input protection sheet.
-- `hardware/Bucks.kicad_sch` — LMR33630 24→5 V; TPS62133 5→3.3 V.
+- `hardware/Bucks.kicad_sch` — LMR33630ADDAR 24→3.3 V single-stage (5V rail eliminated).
 - `hardware/USB_Prog.kicad_sch` — TPS22919 → TLV75533 (USB-only) sheet.
 - `hardware/MCU.kicad_sch` — ESP32-S3-WROOM-1 connections.
 - `hardware/Motor_Driver.kicad_sch` — DRV8353RS + MOSFET bridge + shunts.
@@ -65,7 +65,7 @@
 - `firmware/src/spi_drv8353.cpp` — Minimal DRV8353RS SPI init and raw status/ID reads.
 - `scripts/check_pinmap.py` — ensures pins.h matches the SSOT table.
 - `scripts/check_docs_index.py` — verifies this index and reports unindexed artifacts.
-- `scripts/check_kicad_outline.py` — verifies PCB outline ≤80×60 mm and presence/locations of 4× M3 holes.
+- `scripts/check_kicad_outline.py` — verifies PCB outline 75×55 mm and presence/locations of 4× M3 holes at (4,4), (71,4), (4,51), (71,51).
 - `scripts/check_netlabels_vs_pins.py` — confirms required net labels exist for firmware/connector coverage.
 - `scripts/check_value_locks.py` — cross-checks LM5069-1, DRV8873 R_ILIM/R_IPROPI locks, and board size across docs.
 - `scripts/check_policy_strings.py` — blocks banned strings outside allowlisted files.

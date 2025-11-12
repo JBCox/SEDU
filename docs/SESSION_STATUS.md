@@ -26,7 +26,7 @@
 
 ## Next Actions (Me)
 - Create KiCad project files and draw the hierarchical sheets.
-- Place board outline (≤80×60), 4× M3 holes, and connectors (edge‑aligned).
+- Place board outline (75×55mm), 4× M3 holes at (4,4), (71,4), (4,51), (71,51), and connectors (edge‑aligned).
 - Run ERC and record notes under this file; adjust symbols/flags until clean.
 
 ## Next Actions (You)

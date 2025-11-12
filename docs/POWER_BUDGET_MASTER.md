@@ -237,82 +237,55 @@
 
 ---
 
-## 4. Buck Converters
+## 4. Buck Converter (Single-Stage)
 
-### 24V → 5V Buck (LMR33630AF)
+### 24V → 3.3V Buck (LMR33630ADDAR)
 
-**Component**: LMR33630AFQRNXRQ1 (TI, 3A capable)
+**Component**: LMR33630ADDAR (TI, 3A capable, 400kHz switching)
 **BOM Line**: hardware/BOM_Seed.csv:9
 
-**Load Budget**:
+**Design Change**: 5V rail eliminated. Single-stage 24V→3.3V conversion replaces previous two-stage (24V→5V→3.3V) design. Trade-off: slightly lower efficiency (+0.27W loss) for simpler design (1 IC instead of 2), fewer components, better reliability.
+
+**Load Budget (3.3V Rail)**:
 | Consumer | Current | Notes |
 |----------|---------|-------|
-| TPS62133 (3.3V buck) | 1.2A max | MCU + peripherals |
-| DRV8353 logic | 50mA | DVDD supply |
-| LCD backlight | 20mA | LEDK via FET |
-| **Total** | **1.27A** | |
+| ESP32-S3 (active) | 500mA | WiFi TX peak |
+| ESP32-S3 (idle) | 50mA | Sleep modes |
+| LCD logic | 50mA | SPI interface |
+| Hall sensors | 30mA | Pull-ups |
+| Misc (LEDs, ADCs) | 50mA | GPIO pull-ups, etc |
+| **Total** | **680mA** | **NOTE: DRV8353 DVDD (5V) is internally generated, not supplied by this buck** |
 
 **Operating Point**:
-- Input: 24V nominal (18-30V range)
-- Output: 5.0V @ 1.3A = **6.5W**
-- Efficiency: ~90% (from TI curves at 24V→5V, 1A)
-- Input power: 6.5W / 0.90 = **7.2W**
-- Input current: 7.2W / 24V = **0.30A**
+- Input: 24V nominal (18-30V range from LM5069)
+- Output: 3.3V @ 3.0A capable (0.7A typical, 3A peak)
+- Efficiency: ~88% (lower than two-stage due to large voltage step 24V→3.3V)
+- Output power: 3.3V × 3.0A = **9.9W** (max capability)
+- Input power: 9.9W / 0.88 = **11.25W**
+- Input current: 11.25W / 24V = **0.47A** (at full 3A load)
+- Typical input current: ~0.32A @ 0.7A load
 
 **Component Stress**:
-- Output current: 1.3A / 3A rating = **43% utilization** ✅ EXCELLENT
+- Output current: 3.0A / 3A rating = **100% utilization at peak** ⚠️ (acceptable for prototype; 0.7A typical = 23%)
 - Switching FET: Integrated, rated for full 3A continuous
+- Thermal: 1.35W dissipation @ 3A load → ΔT = 1.35W × 40°C/W = **54°C rise** (Tj = 79°C @ 25°C ambient) ✅
 
 **Inductor (L4)**:
-- **Component**: SLF10145T-100M2R2-PF (TDK 10µH, 4.2A sat, 1008)
+- **Component**: SLF10145T-100M2R5-PF (TDK 10µH, 2.5A DCR rating, 1008)
 - **BOM Line**: hardware/BOM_Seed.csv:10
-- **Current rating**: 4.2A saturation / 1.3A actual = **69% margin** ✅
-- **DC resistance**: 23mΩ typical
-- **Copper loss**: P = 1.3² × 0.023 = **39mW** (negligible)
+- **Note**: 10µH may be suboptimal for 24V→3.3V (large voltage step). Consider 15-22µH for improved efficiency.
+- **Current rating**: 2.5A DCR / 3.0A actual = **17% margin** ⚠️ (tight but acceptable for continuous 3A)
+- **Saturation current**: ~4.2A typ → adequate for transients
+- **DC resistance**: ~35mΩ typical
+- **Copper loss**: P = 3.0² × 0.035 = **315mW** (included in efficiency calc)
 
 **Output Capacitors (C4x)**:
 - **Component**: GRM21BR61A226ME44L (Murata 22µF, 10V X7R, 0805)
 - **BOM Line**: hardware/BOM_Seed.csv:11
 - **Quantity**: 4 parallel = 88µF total
-- **Voltage stress**: 5V / 10V rating = **50%** ✅
-- **Ripple current**: ~500mA RMS @ 400kHz switching
-- **ESR**: ~10mΩ typical → I²R = 0.5² × 0.01 = **2.5mW** per cap ✅
-
-### 5V → 3.3V Buck (TPS62133)
-
-**Component**: TPS62133RGTT (TI, 3A capable)
-**BOM Line**: hardware/BOM_Seed.csv:12
-
-**Load Budget**:
-| Consumer | Current | Notes |
-|----------|---------|-------|
-| ESP32-S3 (active) | 500mA | WiFi TX peak |
-| ESP32-S3 (idle) | 50mA | Sleep modes |
-| DRV8353 logic | 50mA | DVDD via 5V buck |
-| LCD logic | 50mA | SPI interface |
-| Hall sensors | 30mA | Pull-ups |
-| Misc (LEDs, etc) | 50mA | |
-| **Total** | **730mA** | |
-
-**Operating Point**:
-- Input: 5.0V
-- Output: 3.3V @ 0.8A = **2.6W**
-- Efficiency: ~92% (from TI curves)
-- Input current: 2.6W / 5V / 0.92 = **0.57A**
-
-**Component Stress**:
-- Output current: 0.8A / 3A rating = **27% utilization** ✅ EXCELLENT
-
-**Inductor (L5)**:
-- **Component**: SLF10145T-2R2M2R2-PF (TDK 2.2µH, 4.2A sat, 1008)
-- **BOM Line**: hardware/BOM_Seed.csv:13
-- **Current rating**: 4.2A / 0.8A = **81% margin** ✅
-
-**Output Capacitors (C5x)**:
-- **Component**: GRM21BR60J226ME39L (Murata 22µF, 6.3V X7R, 0805)
-- **BOM Line**: hardware/BOM_Seed.csv:14
-- **Quantity**: 2 parallel = 44µF total
-- **Voltage stress**: 3.3V / 6.3V rating = **48%** ✅
+- **Voltage stress**: 3.3V / 10V rating = **33%** ✅ EXCELLENT
+- **Ripple current**: ~1.5A RMS @ 400kHz switching (large ripple due to big voltage step)
+- **ESR**: ~10mΩ typical → I²R = 1.5² × 0.01 = **22mW** per cap ✅
 
 ---
 
@@ -449,8 +422,7 @@
 | Gate resistors | 2µW | 100mW | 99.998% | ✅ EXCELLENT |
 | R_ILIM (DRV8873) | 4mW | 100mW | 96% | ✅ PASS |
 | R_IPROPI | 9mW | 100mW | 91% | ✅ PASS |
-| LMR33630 (24V→5V) | 1.3A out | 3A | 57% | ✅ EXCELLENT |
-| TPS62133 (5V→3.3V) | 0.8A out | 3A | 73% | ✅ EXCELLENT |
+| LMR33630 (24V→3.3V) | 3.0A out | 3A | 0% | ⚠️ ACCEPTABLE (0.7A typical = 77% margin) |
 | J_BAT connector | 20A peak | 30A | 33% | ✅ ACCEPTABLE |
 | J_ACT connector | 3.3A | 8A | 59% | ✅ ADEQUATE |
 

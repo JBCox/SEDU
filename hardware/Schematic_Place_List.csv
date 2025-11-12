@@ -10,13 +10,10 @@ Power_In,ROV_TOP,221kΩ 1%,OV divider top (≈29.2 V trip)
 Power_In,ROV_BOT,10.0kΩ 1%,OV divider bottom
 Power_In,NT_PGND_LGND,NetTie_2,Star ground tie near LM5069 sense
 
-Bucks,U4,LMR33630AF,24→5V buck
-Bucks,L4,10µH ≥4A sat,5V buck inductor (8–10µH ok)
-Bucks,C4x,22µF 10V X7R ×4,5V buck output
-Bucks,C4IN,10µF 50V X7R + 220nF,5V buck input
-Bucks,U5,TPS62133,5→3.3V buck
-Bucks,L5,2.2µH ≥3.8A sat,3.3V buck inductor
-Bucks,C5x,22µF 6.3V X7R ×2,3.3V buck output
+Bucks,U4,LMR33630ADDAR,24→3.3V buck (single-stage; 5V rail eliminated)
+Bucks,L4,10-22µH ≥2.5A,3.3V buck inductor (10µH for prototype)
+Bucks,C4x,22µF 10V X7R ×4,3.3V buck output
+Bucks,C4IN,10µF 50V X7R + 220nF,3.3V buck input
 
 USB_Prog,U7,TPS22919,USB load switch
 USB_Prog,U8,TLV75533,USB-only 3.3V LDO
@@ -82,7 +79,6 @@ IO_UI,C19,100nF,RC at ladder node
 IO_UI,R_BTN_SER,100–220Ω,Series at BTN_SENSE to MCU
 
 TestPads,TP_3V3,Test pad,3.3 V rail
-TestPads,TP_5V,Test pad,5 V rail
 TestPads,TP_24V,Test pad,VBAT_PROT
 TestPads,TP_BTN,Test pad,BTN_SENSE
 TestPads,TP_IPROPI,Test pad,IPROPI_ADC

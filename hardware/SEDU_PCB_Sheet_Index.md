@@ -5,14 +5,13 @@
   - UV turn-on ≈ 19.0 V (RUV 140k/10k); OV trip ≈ 29.2–29.6 V (ROV 221k/10k); star ground near shunt.
   - Star join: explicit NetTie_2 to join PGND↔LGND at the Mecca star near sense resistor.
 - Bucks
-  - LMR33630AF 24→5 V @ ~400 kHz; L = 8–10 µH; COUT = 4×22 µF X7R (≥10 V); CIN ≥10 µF + 220 nF.
-  - TPS62133 5→3.3 V; L = 2.2 µH; COUT = 22–44 µF; CIN ≈ 10 µF.
+  - LMR33630ADDAR 24→3.3 V @ 400 kHz (single-stage); L = 10-22 µH; COUT = 4×22 µF X7R (≥10 V); CIN ≥10 µF + 220 nF. **(5V rail eliminated for simpler design)**
 - USB_Prog
   - TPS22919 → TLV75533; USB-only 3.3 V; radios OFF; never powers tool; ESD + 22–33 Ω on D±.
   - Type‑C UFP: CC1/CC2 pulldowns (R_CC1 = R_CC2 = 5.1 kΩ to GND).
   - Optional ESD on CC pins (DNI): 2‑line TVS array placed next to CC1/CC2.
 - MCU
-  - ESP32-S3-WROOM-1-N16R8; pins per SSOT; keep GPIO-JTAG disabled; add test pads for 3V3/5V/24V/RX/TX/BTN_SENSE/IPROPI.
+  - ESP32-S3-WROOM-1-N16R8; pins per SSOT; keep GPIO-JTAG disabled; add test pads for 3V3/24V/RX/TX/BTN_SENSE/IPROPI.
   - ADC anti-alias: series + shunt RCs at GPIO1/2/5/6/7 per README (CSA, BAT, IPROPI).
 - Motor_Driver
   - DRV8353RS + 6× 60 V MOSFETs; 3× 2 mΩ 2512 Kelvin shunts; decoupling: CPL-CPH 47 nF; VCP, VGLS, DVDD 1 µF.

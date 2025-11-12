@@ -35,7 +35,7 @@ python scripts/check_power_budget.py  # Exit code 1 expected for known issues
 # 4. Net label consistency (schematic ↔ firmware)
 python scripts/check_netlabels_vs_pins.py
 
-# 5. Board geometry (≤80×60mm, 4× M3 holes)
+# 5. Board geometry (75×55mm, 4× M3 holes)
 python scripts/check_kicad_outline.py
 
 # 6. Power calculations verification
@@ -88,7 +88,7 @@ Battery 24V (6S LiPo)
 LM5069-1 Hot-Swap (ILIM=18.3A, UV/OV, latch-off) + SMBJ33A TVS
     ↓
 Protected 24V Rail
-    ├─→ LMR33630 (24V→5V) → TPS62133 (5V→3.3V logic)
+    ├─→ LMR33630ADDAR (24V→3.3V logic, single-stage; 5V rail eliminated)
     ├─→ DRV8353RS + 6× MOSFETs (motor, 20A peak)
     └─→ DRV8873-Q1 (actuator, 3.3A continuous)
 ```
@@ -227,7 +227,7 @@ This project uses coordinated development between Claude Code, Codex CLI, and Ge
 - LM5069 RS_IN: 3.0mΩ (ILIM = 55mV / 3.0mΩ = 18.3A)
 - DRV8873 R_ILIM: 1.58kΩ (3.3A limit)
 - DRV8873 R_IPROPI: 1.00kΩ
-- Board outline: ≤80×60mm
+- Board outline: 75×55mm
 - M3 holes: 4× at specified positions
 
 Changes to these require:
@@ -241,7 +241,7 @@ Changes to these require:
 Follow `docs/BRINGUP_CHECKLIST.md`:
 1. Visual inspection (no shorts, all components placed)
 2. Battery disconnected: USB programming test
-3. Battery connected: verify 5V/3.3V rails
+3. Battery connected: verify 3.3V rail
 4. DRV8353 SPI communication (read ID register)
 5. Battery ADC calibration (verify 18V-25.2V range)
 6. Hall sensor verification (spin motor, check edge count)

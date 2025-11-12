@@ -5,7 +5,7 @@ This folder documents the exact KiCad structure to build. First spin omits 12 V 
 ## Project Layout (to create in KiCad)
 - `SEDU_PCB.kicad_pro` — top‑level project
 - `SEDU_PCB.kicad_sch` — top sheet with hierarchical blocks below
-- `SEDU_PCB.kicad_pcb` — board file (80×60 mm target outline + 4× M3 holes)
+- `SEDU_PCB.kicad_pcb` — board file (75×55 mm target outline + 4× M3 holes)
 
 ## Hierarchical Sheets
 - Power_In (LM5069‑1 + TVS + reverse FET)
@@ -29,10 +29,10 @@ See `hardware/SEDU_PCB_Sheet_Index.md` for per‑sheet details and refs.
   - Cable ≤200 mm; BTN_SENSE twisted with GND; 100–220 Ω series at J_UI; 100 nF at MCU ADC pin.
 
 ## Board Outline & Holes
-- Initial layout: 80×60 mm board outline (conservative starting point)
-- After placement/routing: optimize size by shrinking to actual component extents + 3-5mm margin
-- Final size estimated: 65-75mm × 50-58mm (determined by thermal, EMI, routing requirements)
-- Four M3 holes (3.2 mm finished), positions TBD after board size optimization
+- Board outline: **75×55 mm** (optimized from 80×60mm baseline; 14% area reduction)
+- Optimization leverages 5V rail elimination (~12-15mm space savings in power section)
+- Thermal analysis confirms adequate copper area (470mm²/W) for 8.5W dissipation
+- Four M3 holes (3.2 mm finished) at positions: (4,4), (71,4), (4,51), (71,51) mm from corner
 - Keep‑out annulus ≥1.5 mm around holes. Tented vias near holes.
 - **Note**: Mounting holes NOT constrained by enclosure - tool designed around board
 
@@ -47,7 +47,6 @@ See `hardware/SEDU_PCB_Sheet_Index.md` for per‑sheet details and refs.
   - `MOTOR_PHASE`: clearance ≥0.50 mm; trace ≥3.00 mm; via dia ≥1.2 mm (drill ≥0.6 mm). Symmetric pours to connector.
   - `ACTUATOR`: clearance ≥0.40 mm; trace ≥1.50 mm; via dia ≥1.0 mm (drill ≥0.5 mm).
   - `BUCK_SW_24V`: clearance ≥0.50 mm; trace ≥1.00 mm; SW island minimal, loop area small.
-  - `BUCK_SW_5V`:  clearance ≥0.50 mm; trace ≥0.80 mm; SW island minimal, loop area small.
   - `SENSE_KELVIN`: clearance ≥0.20 mm; trace ≥0.25 mm; guard with GND; true Kelvin sense.
   - `USB_DIFF`: clearance ≥0.20 mm; trace ≥0.20 mm; place 22–33 Ω series at MCU; ESD at connector.
 
@@ -56,7 +55,6 @@ Assign nets:
 - `MOTOR_PHASE`: label phase outputs `PHASE_U`, `PHASE_V`, `PHASE_W` at MOSFET bridge.
 - `ACTUATOR`: label DRV8873 outputs `ACT_OUT_A`, `ACT_OUT_B`.
 - `BUCK_SW_24V`: label LMR33630 switch node `SW_24V`.
-- `BUCK_SW_5V`: label TPS62133 switch node `SW_5V`.
 - `SENSE_KELVIN`: `CSA_U_ADC`, `CSA_V_ADC`, `CSA_W_ADC`, `BAT_ADC`, `BTN_SENSE`, `IPROPI_ADC`, `NTC_ADC`.
 - `USB_DIFF`: `USB_D+`, `USB_D-`.
 
@@ -79,7 +77,7 @@ Planes, pours, and keep‑outs:
 - BTN_SENSE: guarded route; series 100–220 Ω + 0.1 µF populated; ≥10 mm from high‑di/dt pours.
 - ESD/series resistors: USB ESD at connector; 22–33 Ω series at MCU D+/D−.
 - TVS: SMBJ33A at battery and actuator connectors with shortest GND return path.
-- Test pads: 3V3/5V/24V/RX/TX/`BTN_SENSE`/`IPROPI` reachable with probe clips.
+- Test pads: 3V3/24V/RX/TX/`BTN_SENSE`/`IPROPI` reachable with probe clips. **(5V test pad removed - rail eliminated)**
 - Thermals: vias under hot parts (inductors, driver, MOSFETs as applicable) with fab‑compatible constraints.
  - Silkscreen: Pin‑1 indicators clearly marked on J_LCD and J_UI; verify orientation against connector drawings.
 
@@ -96,20 +94,20 @@ Planes, pours, and keep‑outs:
 - Route gate return currents tightly with their source references; avoid crossing sensitive analog.
 - Place DRV8353RS close to the bridge; place VGLS/VCP/DVDD decoupling at pins with direct vias.
 
-## Placement Zones (80×60 mm starting outline)
+## Placement Zones (75×55 mm optimized outline)
 - Power Entry + Star: Place LM5069, TVS, reverse FET, and battery connector along one short edge. The PGND↔LGND NetTie_2 star sits immediately downstream of the sense resistor. Keep VBAT/VBAT_PROT pours wide with via stitching.
-- Bucks (24→5 V, 5→3V3): Next to power entry, with SW islands oriented inward (away from MCU/ADC). Provide local copper for thermal spread.
+- Buck (24→3.3V): Next to power entry, with SW island oriented inward (away from MCU/ADC). Provide local copper for thermal spread. **8× thermal vias (Ø0.3mm) under LMR33630 PowerPAD mandatory.**
 - Bridge + Shunts: Place DRV8353RS + MOSFETs + shunts together on the side opposite the MCU/antenna. Keep gate resistors at gates; true Kelvin from shunts; phase pours to motor connector.
 - MCU + LCD/UI: Opposite phases/SW nodes; enforce antenna keep‑out (≥15 mm forward, ≥5 mm perimeter). Route BTN_SENSE/IPROPI/CSA far from SW/phase pours; guard with GND and stitch vias.
 - Connectors: J_UI and J_LCD away from motor/actuator connectors; ESD arrays at connectors; series resistors near pins.
 
 ### Initial Placement Checklist (Day‑One)
 - Place LM5069 + battery connector + star (NetTie_2) along one edge; verify star location.
-- Place LMR33630/TPS62133 with SW islands facing away from MCU; add copper for thermals.
+- Place LMR33630 with SW island facing away from MCU; add copper for thermals. **(TPS62133 removed - 5V rail eliminated)**
 - Place DRV8353RS, MOSFETs, shunts as a cluster; gate resistors at FET gates; plan phase pours.
 - Respect antenna keep‑out; position MCU/LCD/UI far from SW/phase; guard ADC nets with GND + vias.
 - Place J_UI/J_LCD away from motor/actuator connectors; put ESD/series parts at connector side.
-- Drop TP_* pads (3V3/5V/24V/BTN/IPROPI/RX/TX) and check probe access.
+- Drop TP_* pads (3V3/24V/BTN/IPROPI/RX/TX) and check probe access. **(5V removed)**
 
 ## How to Resume
 1) Open KiCad and create `SEDU_PCB.kicad_pro` in this folder.

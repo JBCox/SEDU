@@ -39,12 +39,11 @@
     (net_class "ACTUATOR" (clearance 0.40) (trace_width 1.50)
       (via_dia 1.00) (via_drill 0.50))
     (net_class "BUCK_SW_24V" (clearance 0.50) (trace_width 1.00))
-    (net_class "BUCK_SW_5V"  (clearance 0.50) (trace_width 0.80))
     (net_class "SENSE_KELVIN" (clearance 0.20) (trace_width 0.25))
     (net_class "USB_DIFF" (clearance 0.20) (trace_width 0.20))
   )
-  (gr_rect (start 0 0) (end 80 60) (layer "Edge.Cuts") (width 0.1) (fill none))
-  (gr_text "SEDU_PCB 80x60 mm first spin" (at 5 62) (layer "Dwgs.User")
+  (gr_rect (start 0 0) (end 75 55) (layer "Edge.Cuts") (width 0.1) (fill none))
+  (gr_text "SEDU_PCB 75x55 mm optimized" (at 5 57) (layer "Dwgs.User")
     (effects (font (size 1.2 1.2) (thickness 0.2))))
 
   ; Mounting holes (M3, 3.2 mm finished)
@@ -58,7 +57,7 @@
     (pad "" np_thru_hole circle (at 0 0) (size 3.2 3.2) (drill 3.2) (layers "*.Cu" "*.Mask")))
 
   (footprint "MountingHole:MountingHole_3.2mm_M3" (layer "F.Cu")
-    (tedit 5B9249C2) (at 76 4)
+    (tedit 5B9249C2) (at 71 4)
     (attr exclude_from_pos_files exclude_from_bom)
     (fp_text reference "H2" (at 0 -3.7) (layer "F.SilkS") hide
       (effects (font (size 1 1) (thickness 0.15))))
@@ -67,7 +66,7 @@
     (pad "" np_thru_hole circle (at 0 0) (size 3.2 3.2) (drill 3.2) (layers "*.Cu" "*.Mask")))
 
   (footprint "MountingHole:MountingHole_3.2mm_M3" (layer "F.Cu")
-    (tedit 5B9249C2) (at 4 56)
+    (tedit 5B9249C2) (at 4 51)
     (attr exclude_from_pos_files exclude_from_bom)
     (fp_text reference "H3" (at 0 -3.7) (layer "F.SilkS") hide
       (effects (font (size 1 1) (thickness 0.15))))
@@ -76,7 +75,7 @@
     (pad "" np_thru_hole circle (at 0 0) (size 3.2 3.2) (drill 3.2) (layers "*.Cu" "*.Mask")))
 
   (footprint "MountingHole:MountingHole_3.2mm_M3" (layer "F.Cu")
-    (tedit 5B9249C2) (at 76 56)
+    (tedit 5B9249C2) (at 71 51)
     (attr exclude_from_pos_files exclude_from_bom)
     (fp_text reference "H4" (at 0 -3.7) (layer "F.SilkS") hide
       (effects (font (size 1 1) (thickness 0.15))))

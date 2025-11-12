@@ -26,11 +26,8 @@
 - L4 (10 µH), C4x, C4IN
   - Symbols: `Device:L`, `Device:C`
   - Footprints: `Inductor_SMD:L_1008_2520Metric` (or chosen size), `Capacitor_SMD:C_0603_1608Metric` / `C_0805_2012Metric`.
-- U5 (TPS62133)
-  - Symbol: `Regulator_Switching:TPS62133` (or `StepDown_Generic`)
-  - Footprint: `Package_DFN_QFN:QFN-16-1EP_3x3mm_P0.5mm`.
-- L5, C5x
-  - As above (choose sizes per availability).
+- U5 (TPS62133), L5, C5x
+  - **REMOVED** - 5V rail eliminated. Single-stage 24V→3.3V conversion (LMR33630ADDAR only).
 
 ## USB_Prog
 - U7 (TPS22919)

@@ -668,7 +668,8 @@ Please proceed with implementation. Excellent work on the thorough verification 
   - Actuator: TVS2
   - LCD_Connector: R_SCK, R_MOSI, Q_LED, FB_LED
   - IO_UI: ESD_UI, R_START_SER, R_STOP_SER, R19, R20, R21, R11, C19, R_BTN_SER
-  - TestPads: TP_3V3, TP_5V, TP_24V, TP_BTN, TP_IPROPI, TP_RX, TP_TX
+  - TestPads: TP_3V3, ~~TP_5V~~, TP_24V, TP_BTN, TP_IPROPI, TP_RX, TP_TX
+  _(Note: TP_5V removed 2025-11-12 - 5V rail eliminated)_
 
 ✅ All passives assigned real MPNs:
   - Resistors: Yageo RC series (0402/0603) and Panasonic ERA series

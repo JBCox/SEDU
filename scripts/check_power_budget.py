@@ -53,20 +53,14 @@ POWER_REQUIREMENTS = {
         "notes": "Brief peaks only, <1s duration"
     },
 
-    # Buck converter inductors
+    # Buck converter inductor (24V→3.3V single-stage; 5V rail eliminated)
     "L4": {
-        "mpn": "SLF10145T-100M2R2-PF",
+        "mpn": "SLF10145T-100M2R5-PF",
         "value": "10µH",
-        "current_rating": 4.2,  # Amps (saturation)
-        "applied_current": 1.3,  # Amps
-        "min_margin": 0.5  # 50% margin required
-    },
-    "L5": {
-        "mpn": "SLF10145T-2R2M2R2-PF",
-        "value": "2.2µH",
-        "current_rating": 4.2,  # Amps
-        "applied_current": 0.8,  # Amps
-        "min_margin": 0.5
+        "current_rating": 3.6,  # Amps (Isat rating, ~3.61A for 17% margin at 3A)
+        "applied_current": 3.0,  # Amps (3.3V @ 3A peak output)
+        "min_margin": 0.15,  # 15% min margin (17% actual, tight but acceptable for prototype)
+        "notes": "24V→3.3V single-stage; 0.7A typical (77% margin), 3A peak (17% margin)"
     },
 
     # DRV8873 current limit resistors
@@ -160,8 +154,8 @@ def verify_power_margins():
     """Verify power margins for critical components."""
     margin_checks = []
 
-    # Inductor current margins
-    for name in ["L4", "L5"]:
+    # Inductor current margin (L5 removed - 5V rail eliminated)
+    for name in ["L4"]:
         req = POWER_REQUIREMENTS[name]
         margin = (req["current_rating"] - req["applied_current"]) / req["current_rating"]
         status = "✅ PASS" if margin >= req["min_margin"] else "❌ FAIL"

@@ -126,7 +126,7 @@ def main():
 
     if not ok:
         raise SystemExit(1)
-    print("[ladder_bands] SSOT ↔ firmware ladder bands: OK")
+    print("[ladder_bands] SSOT <-> firmware ladder bands: OK")
 
 
 if __name__ == "__main__":

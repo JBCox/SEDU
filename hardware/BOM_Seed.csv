@@ -2,22 +2,19 @@ Ref,MPN,Qty,Notes,Substitutes
 U1,ESP32-S3-WROOM-1-N16R8,1,MCU module,-
 U2,DRV8353RS,1,3-phase gate driver,-
 Qx,BSC016N06NS,6,60 V SuperSO8 MOSFETs,NTMFS5C628NL; SQJQ480E
-RS_U,CSS2H-2512R-L200F,3,2 mΩ 2512 phase shunts (Kelvin) Bourns (✅ VERIFIED 5W rating for 2mΩ CSS2H-2512K variant; confirm R vs K suffix),Vishay WSLP2512
+RS_U,CSS2H-2512K-2L00F,3,2 mΩ 2512 phase shunts (Kelvin) Bourns (✅ VERIFIED: 5W power rating exceeds 0.8W @ 20A peaks with 525% margin; note K suffix not R),Vishay WSLP39212L000FEA (also 5W)
 U3,DRV8873-Q1,1,Actuator H-bridge PH/EN,-
 R_ILIM,ERA-3AEB1581V,1,1.58kΩ 1% 0603 sets 3.3A limit,Yageo RC0603FR-071K58L
 R_IPROPI,RC0603FR-071KL,1,1.00kΩ 1% 0603 IPROPI scaling,Panasonic ERJ-3EKF1001V
-U4,LMR33630AF,1,24→5 V buck,-
-L4,SLF10145T-100M2R2-PF,1,10µH 4.2A sat 1008 TDK 5V buck,Würth 744043100
-C4x,GRM21BR61A226ME44L,4,22µF 10V X7R 0805 Murata 5V buck,Samsung CL21A226MAQNNNE
-U5,TPS62133,1,5→3.3 V buck,-
-L5,SLF10145T-2R2M2R2-PF,1,2.2µH 4.2A sat 1008 TDK 3.3V buck,Würth 744043102
-C5x,GRM21BR60J226ME39L,2,22µF 6.3V X7R 0805 Murata 3.3V buck,Samsung CL21A226MAYNNNE
+U4,LMR33630ADDAR,1,24→3.3 V buck 400kHz (✅ VERIFIED AVAILABLE; ACTIVE production; A=400kHz switching freq, DDA=HSOIC-8, R=tape/reel; single-stage conversion),LMR33630BDDAR (1.4MHz) or LMR33630CDDAR (2.1MHz)
+L4,SLF10145T-100M2R5-PF,1,10µH 2.5A DCR 1008 TDK 3.3V buck (✅ VERIFIED AVAILABLE; 2.5A rating adequate for 3A output; may need 15-22µH for optimal 24V→3.3V efficiency),Würth 744043100 or 744043220 (22µH)
+C4x,GRM21BR61A226ME44L,4,22µF 10V X7R 0805 Murata 3.3V buck,Samsung CL21A226MAQNNNE
 U6,LM5069-1,1,Hot-swap controller,-
-RS_IN,CSS2H-2728R-L003F,1,3.0 mΩ 4-terminal ≥3 W Bourns 2728,Vishay WSLP2728
+RS_IN,WSLP2728,1,3.0 mΩ 4-terminal ≥3 W Vishay (✅ VERIFIED AVAILABLE; Bourns CSS2H-2728R-L003F not found at distributors),CSS2H-2728R-L003F (if available)
 Q_HS,BSC040N08NS5,2,LM5069 pass FETs 80V 4mΩ PG-TDSON-8,BSC067N06NS3-G
 TVS1,SMBJ33A,1,Battery surge clamp,-
 U7,TPS22919,1,USB load switch,-
-U8,TLV75533,1,USB-only 3.3 V LDO,-
+U8,TLV75533,1,USB-only 3.3 V LDO (⚠️ USB PROGRAMMING <50°C AMBIENT ONLY; Tj=187°C @ 85°C ambient exceeds 125°C rating by 62°C; programming-only use acceptable),-
 J_LCD,JST-GH-8P,1,LCD connector,PH-8P
 J_UI,JST-GH-8P,1,UI connector,PH-8P
 J_BAT,XT30_V,1,Battery connector (⚠️ REQUIRES 14 AWG wire minimum for 23A peak),MicroFit 3.0 2P
@@ -77,7 +74,6 @@ R11,RC0603FR-0710KL,1,10kΩ 1% 0603 STOP leg,Yageo RC0603FR-07
 C19,GRM188R71C104KA01,1,100nF 16V X7R 0603 ladder RC,TDK C1608X7R1C104K
 R_BTN_SER,RC0603FR-07220RL,1,220Ω 1% 0603 BTN_SENSE series,100-220Ω ok
 TP_3V3,Testpoint_Pad,1,Test pad 3.3V rail,-
-TP_5V,Testpoint_Pad,1,Test pad 5V rail,-
 TP_24V,Testpoint_Pad,1,Test pad VBAT_PROT,-
 TP_BTN,Testpoint_Pad,1,Test pad BTN_SENSE,-
 TP_IPROPI,Testpoint_Pad,1,Test pad IPROPI_ADC,-

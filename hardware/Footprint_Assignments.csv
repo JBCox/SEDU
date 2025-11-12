@@ -19,7 +19,7 @@ RS_V,Resistor_SMD:R_2512_6332Metric
 RS_W,Resistor_SMD:R_2512_6332Metric
 RS_IN,SEDU:R_2728_4T_Kelvin
 L4,Inductor_SMD:L_1008_2520Metric
-L5,Inductor_SMD:L_1008_2520Metric
+# L5,Inductor_SMD:L_1008_2520Metric,REMOVED - 5V rail eliminated
 C4IN,Capacitor_SMD:C_1206_3216Metric
 C4_1,Capacitor_SMD:C_0805_2012Metric
 C4_2,Capacitor_SMD:C_0805_2012Metric

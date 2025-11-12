@@ -26,16 +26,16 @@ Any change from the old VESC+DRV8871 harness (e.g., DRV8873 upgrade, discrete St
 - Keep **Wi‑Fi + BLE** available (ESP32 family), **Arduino‑programmable**.
 - UI: **Start/Stop** buttons; **LCD shows battery % + motor RPM/current**; basic Ready/Run/Fault states.
 - **Battery (24 V) is the only power during use.** USB‑C is optional and for **programming only**.
-- **One PCB** (≤ **100 × 60 mm**) unless explicitly split in a future rev with trade‑offs.
+- **One PCB** (**75 × 55 mm** optimized from 80×60mm baseline) unless explicitly split in a future rev with trade‑offs.
 
 ---
 
 ## 2) Locked Electrical Architecture (Rev C.4a)
 
 **Power & protection**  
-- **LM5069-1 (latch-off)** hot‑swap / inrush / OV‑UV + **SMBJ33A TVS** at 24 V input.  
-- **LMR33630** 24→5 V logic buck; **TPS62133** 5→3.3 V (or TLV62569 class).  
-- **USB programming‑only path:** **TPS22919 (load switch) → TLV75533 (3.3 V LDO)**. Radios **OFF** in this mode. Never back‑feed the 5 V buck. Never run the tool from USB.
+- **LM5069-1 (latch-off)** hot‑swap / inrush / OV‑UV + **SMBJ33A TVS** at 24 V input.
+- **LMR33630ADDAR** 24→3.3 V logic buck (single-stage; 5V rail eliminated).
+- **USB programming‑only path:** **TPS22919 (load switch) → TLV75533 (3.3 V LDO)**. Radios **OFF** in this mode. Never back‑feed the main 3.3 V buck. Never run the tool from USB.
  - **Actuator default:** 24 V actuator (DRV8873 VM tied to protected 24 V). Optional 12 V actuator via DNI buck rail.
 
 **Motor stage**  
@@ -123,9 +123,8 @@ If any constant differs in silicon/layout, **update both** the table and `pins.h
 
 ## 5) Components — Locked Decisions
 
-- **Hot‑swap:** LM5069 + external FET (size for surge), **SMBJ33A** TVS at 24 V.  
-- **24→5 buck:** LMR33630.  
-- **5→3.3 logic:** TPS62133 (or TLV62569 class).  
+- **Hot‑swap:** LM5069 + external FET (size for surge), **SMBJ33A** TVS at 24 V.
+- **24→3.3 buck (single-stage):** LMR33630ADDAR (5V rail eliminated for simpler design).
 - **USB programming rail:** **TPS22919 → TLV75533**, radios **OFF**, never powers tool.  
 - **Gate driver:** DRV8353RS; **CSAs gain 20 V/V**, RC at MCU.  
 - **Shunts:** 2 mΩ, 2512, pulse‑rated (Bourns/Vishay/KOA).  

@@ -6,7 +6,7 @@ This directory contains datasheets for all major components used in the SEDU Sin
 
 ### Power Management
 - **LM5069_datasheet.pdf** - Hot-swap controller (current limit, circuit breaker)
-- **LMR33630AF_datasheet.pdf** - 24V → 5V buck converter (logic rail)
+- **LMR33630AF_datasheet.pdf** - 24V → 3.3V buck converter (logic rail, single-stage)
 - **TPS62133_datasheet.pdf** - 5V → 3.3V buck converter (MCU/LCD)
 - **TPS22919_datasheet.pdf** - USB load switch (programming rail isolation)
 

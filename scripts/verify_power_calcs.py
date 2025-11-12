@@ -29,7 +29,7 @@ print(f'   Circuit Breaker:')
 print(f'   V_CB threshold:   {V_CB*1000:.1f} mV')
 print(f'   I_CB calculated:  {I_CB:.1f} A')
 print(f'   Expected I_CB:    35 A')
-print(f'   ✓ MATCH: {abs(I_CB - 35) < 1}')
+print(f'   [OK] MATCH: {abs(I_CB - 35) < 1}')
 print()
 
 # Power dissipation in sense resistor
@@ -39,8 +39,8 @@ P_sense_CB = I_CB**2 * Rsense
 print(f'   Power dissipation in Rsense:')
 print(f'   At ILIM ({I_LIM:.1f}A): {P_sense_peak:.2f} W')
 print(f'   At CB ({I_CB:.1f}A):    {P_sense_CB:.2f} W (brief)')
-print(f'   Rsense rating:    ≥3 W')
-print(f'   ✓ ADEQUATE: {P_sense_peak < 3.0}')
+print(f'   Rsense rating:    >=3 W')
+print(f'   [OK] ADEQUATE: {P_sense_peak < 3.0}')
 print()
 
 # 2. Battery Voltage Divider
@@ -55,12 +55,12 @@ V_adc_max = V_bat_max * R_low / (R_high + R_low)
 V_adc_min = V_bat_min * R_low / (R_high + R_low)
 V_adc_fullscale = 3.5  # ADC_11db full scale (conservative)
 
-print(f'   Divider: {R_high/1000:.1f}kΩ / {R_low/1000:.1f}kΩ (1%)')
+print(f'   Divider: {R_high/1000:.1f}kOhm / {R_low/1000:.1f}kOhm (1%)')
 print(f'   At V_bat_max ({V_bat_max}V): {V_adc_max:.3f} V')
 print(f'   At V_bat_min ({V_bat_min}V): {V_adc_min:.3f} V')
 print(f'   ADC full scale (11dB):       {V_adc_fullscale} V')
 print(f'   Margin at max:               {((V_adc_fullscale - V_adc_max)/V_adc_fullscale)*100:.1f}%')
-print(f'   ✓ ADEQUATE MARGIN: {V_adc_max < V_adc_fullscale * 0.9}')
+print(f'   [OK] ADEQUATE MARGIN: {V_adc_max < V_adc_fullscale * 0.9}')
 print()
 
 # 3. DRV8873 ILIM Calculation
@@ -69,10 +69,10 @@ print('-'*70)
 R_ILIM = 1.58e3  # 1.58 kΩ
 K_ILIM = 5200    # V from datasheet
 I_lim_act = K_ILIM / R_ILIM
-print(f'   R_ILIM:           {R_ILIM/1000:.2f} kΩ')
+print(f'   R_ILIM:           {R_ILIM/1000:.2f} kOhm')
 print(f'   I_ILIM = 5200/R:  {I_lim_act:.2f} A')
 print(f'   Expected:         3.29 A')
-print(f'   ✓ MATCH: {abs(I_lim_act - 3.29) < 0.01}')
+print(f'   [OK] MATCH: {abs(I_lim_act - 3.29) < 0.01}')
 print()
 
 # 4. DRV8873 IPROPI Calculation
@@ -87,12 +87,12 @@ V_IPROPI_at_3A = (3.0 * R_IPROPI) / K_IPROPI
 V_IPROPI_at_33A = (3.3 * R_IPROPI) / K_IPROPI
 V_ADC_max = 3.5
 
-print(f'   R_IPROPI:         {R_IPROPI/1000:.2f} kΩ')
+print(f'   R_IPROPI:         {R_IPROPI/1000:.2f} kOhm')
 print(f'   At 3.0A:          {V_IPROPI_at_3A:.3f} V')
 print(f'   At 3.3A:          {V_IPROPI_at_33A:.3f} V')
 print(f'   ADC max (11dB):   {V_ADC_max} V')
 print(f'   Margin at 3.3A:   {((V_ADC_max - V_IPROPI_at_33A)/V_ADC_max)*100:.1f}%')
-print(f'   ✓ WITHIN RANGE: {V_IPROPI_at_33A < V_ADC_max}')
+print(f'   [OK] WITHIN RANGE: {V_IPROPI_at_33A < V_ADC_max}')
 print()
 
 # 5. Motor CSA Calculation
@@ -111,59 +111,43 @@ print(f'   At I_phase_max ({I_phase_max}A):')
 print(f'   V_shunt:          {V_shunt_max*1000:.1f} mV')
 print(f'   V_CSA_out:        {V_CSA_out:.2f} V')
 print(f'   ADC range:        0 - {V_ADC_max} V')
-print(f'   ✓ WITHIN RANGE: {V_CSA_out < V_ADC_max}')
+print(f'   [OK] WITHIN RANGE: {V_CSA_out < V_ADC_max}')
 print()
 
 # Power in shunt at peak
 P_shunt_peak = I_phase_max**2 * R_shunt
 print(f'   Power in shunt at {I_phase_max}A: {P_shunt_peak:.2f} W')
-print(f'   Shunt rating:     ≥5 W pulse')
-print(f'   ✓ ADEQUATE: {P_shunt_peak < 5.0}')
+print(f'   Shunt rating:     >=5 W pulse')
+print(f'   [OK] ADEQUATE: {P_shunt_peak < 5.0}')
 print()
 
 # 6. Buck Converter Power Dissipation
 print('6. BUCK CONVERTER POWER CALCULATIONS')
 print('-'*70)
 
-# LMR33630 (24V→5V)
-V_in_buck1 = 24.0
-V_out_buck1 = 5.0
-I_out_buck1 = 2.0  # Max output current
-eta_buck1 = 0.92   # 92% efficiency
+# LMR33630 (24V->3.3V) - Single-stage conversion
+V_in_buck = 24.0
+V_out_buck = 3.3
+I_out_buck = 3.0  # Max output current (all logic)
+eta_buck = 0.88   # 88% efficiency (lower due to large voltage step)
 
-P_out_buck1 = V_out_buck1 * I_out_buck1
-P_in_buck1 = P_out_buck1 / eta_buck1
-P_loss_buck1 = P_in_buck1 - P_out_buck1
+P_out_buck = V_out_buck * I_out_buck
+P_in_buck = P_out_buck / eta_buck
+P_loss_buck = P_in_buck - P_out_buck
 
-print(f'   LMR33630 (24V→5V @ 400kHz):')
-print(f'   Input:            {V_in_buck1}V')
-print(f'   Output:           {V_out_buck1}V @ {I_out_buck1}A')
-print(f'   Efficiency:       {eta_buck1*100:.0f}%')
-print(f'   P_out:            {P_out_buck1:.2f} W')
-print(f'   P_in:             {P_in_buck1:.2f} W')
-print(f'   P_loss:           {P_loss_buck1:.2f} W')
-print(f'   Spec target:      0.87 W')
-print(f'   ✓ CLOSE: {abs(P_loss_buck1 - 0.87) < 0.2}')
+print(f'   LMR33630 (24V->3.3V @ 400kHz) - Single-stage:')
+print(f'   Input:            {V_in_buck}V')
+print(f'   Output:           {V_out_buck}V @ {I_out_buck}A')
+print(f'   Efficiency:       {eta_buck*100:.0f}%')
+print(f'   P_out:            {P_out_buck:.2f} W')
+print(f'   P_in:             {P_in_buck:.2f} W')
+print(f'   P_loss:           {P_loss_buck:.2f} W')
+print(f'   Previous (two-stage): 1.08 W loss')
+print(f'   Trade-off: +0.27W loss for simpler design (1 IC vs 2)')
 print()
 
-# TPS62133 (5V→3.3V)
-V_in_buck2 = 5.0
-V_out_buck2 = 3.3
-I_out_buck2 = 1.0  # Typical load
-eta_buck2 = 0.94   # 94% efficiency
-
-P_out_buck2 = V_out_buck2 * I_out_buck2
-P_in_buck2 = P_out_buck2 / eta_buck2
-P_loss_buck2 = P_in_buck2 - P_out_buck2
-
-print(f'   TPS62133 (5V→3.3V):')
-print(f'   Input:            {V_in_buck2}V')
-print(f'   Output:           {V_out_buck2}V @ {I_out_buck2}A')
-print(f'   Efficiency:       {eta_buck2*100:.0f}%')
-print(f'   P_out:            {P_out_buck2:.2f} W')
-print(f'   P_in:             {P_in_buck2:.2f} W')
-print(f'   P_loss:           {P_loss_buck2:.2f} W')
-print(f'   ✓ LOW DISSIPATION: {P_loss_buck2 < 0.5}')
+print(f'   NOTE: 5V rail eliminated. TPS62133 removed from design.')
+print(f'   Single-stage simpler (1 IC vs 2), fewer components, better reliability.')
 print()
 
 # 7. Worst Case Power Budget
@@ -179,9 +163,9 @@ I_motor_battery = (I_motor_peak_phase * duty_cycle) / eta_motor
 # Actuator
 I_actuator = 3.3  # ILIM setting
 
-# Buck converters (reflected to 24V)
-P_logic = P_out_buck1  # Total logic power
-I_buck_reflected = P_logic / V_in_buck1
+# Buck converter (reflected to 24V)
+P_logic = P_out_buck  # Total logic power (single buck now)
+I_buck_reflected = P_logic / V_in_buck
 
 # Total
 I_total_worst = I_motor_battery + I_actuator + I_buck_reflected
@@ -193,7 +177,7 @@ print(f'   - Efficiency:           {eta_motor*100:.0f}%')
 print(f'   - Battery current:      {I_motor_battery:.1f} A')
 print()
 print(f'   Actuator:               {I_actuator} A')
-print(f'   Buck converters:        {I_buck_reflected:.1f} A')
+print(f'   Buck converter:         {I_buck_reflected:.1f} A')
 print()
 print(f'   TOTAL WORST CASE:       {I_total_worst:.1f} A')
 print(f'   LM5069 ILIM:            {I_LIM:.1f} A')
@@ -204,7 +188,7 @@ if I_total_worst > I_LIM:
     print(f'   [WARNING] Worst case exceeds ILIM!')
     print(f'   -> REQUIRES firmware interlock to prevent simultaneous high-power operation')
 else:
-    print(f'   ✓ ADEQUATE: Within ILIM with {((I_LIM - I_total_worst)/I_LIM)*100:.1f}% margin')
+    print(f'   [OK] ADEQUATE: Within ILIM with {((I_LIM - I_total_worst)/I_LIM)*100:.1f}% margin')
 print()
 
 # 8. Component Voltage Ratings
@@ -224,7 +208,7 @@ margin_mosfet = ((V_mosfet_rating - V_system_max) / V_system_max) * 100
 print(f'   MOSFETs:')
 print(f'   - Rating:         {V_mosfet_rating}V')
 print(f'   - Margin:         {margin_mosfet:.0f}%')
-print(f'   ✓ ADEQUATE: {margin_mosfet > 100}')
+print(f'   [OK] ADEQUATE: {margin_mosfet > 100}')
 print()
 
 # TVS
@@ -233,7 +217,7 @@ V_tvs_clamp = 53.3  # Typical clamping at 1A
 print(f'   TVS (SMBJ33A):')
 print(f'   - Standoff:       {V_tvs_standoff}V')
 print(f'   - Clamp (typ):    {V_tvs_clamp}V')
-print(f'   ✓ ADEQUATE: {V_tvs_standoff > V_system_max}')
+print(f'   [OK] ADEQUATE: {V_tvs_standoff > V_system_max}')
 print()
 
 print('='*70)

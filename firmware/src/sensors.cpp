@@ -59,6 +59,22 @@ float ipropiAmpsFromRaw(uint16_t raw, float vref, uint16_t fullscale) {
   const float vipropi = (static_cast<float>(raw) / static_cast<float>(fullscale)) * vref;
   constexpr float kIpropi_k_A_per_A = 1100.0f;
   constexpr float kIpropi_R_ohms = 1000.0f;
+
+  // Issue #4: Warn if ADC near saturation (>90% of full-scale)
+  // At 3.3A: V_IPROPI = 3.0V (91% of 3.3V ADC range) - limited diagnostic margin
+  constexpr float kSaturationWarning = 0.90f * kAdcRef;
+  if (vipropi > kSaturationWarning) {
+    static uint32_t last_warning_ms = 0;
+    if (millis() - last_warning_ms > 1000) {  // Rate-limit to 1/second
+      Serial.print("[WARNING] IPROPI ADC near saturation: ");
+      Serial.print(vipropi);
+      Serial.print("V / ");
+      Serial.print(kAdcRef);
+      Serial.println("V (check for actuator overcurrent or wrong ILIM resistor)");
+      last_warning_ms = millis();
+    }
+  }
+
   return vipropi * (kIpropi_k_A_per_A / kIpropi_R_ohms);
 }
 
@@ -75,6 +91,26 @@ float motorCurrentAmpsFromRaw(uint16_t raw_u, uint16_t raw_v, uint16_t raw_w,
   const float iu = fabsf(csaPhaseAmpsFromRaw(raw_u, vref, fullscale));
   const float iv = fabsf(csaPhaseAmpsFromRaw(raw_v, vref, fullscale));
   const float iw = fabsf(csaPhaseAmpsFromRaw(raw_w, vref, fullscale));
+
+  // Issue #5: Sanity check - any phase >30A indicates CSA hardware fault
+  // LM5069 ILIM = 18.3A, circuit breaker = 35A, so 30A is well above normal operation
+  constexpr float kMaxPhysicalCurrent = 30.0f;
+  if (iu > kMaxPhysicalCurrent || iv > kMaxPhysicalCurrent || iw > kMaxPhysicalCurrent) {
+    static uint32_t last_warning_ms = 0;
+    if (millis() - last_warning_ms > 1000) {  // Rate-limit to 1/second
+      Serial.print("[ERROR] Motor CSA reading out of range (hardware fault): U=");
+      Serial.print(iu);
+      Serial.print("A, V=");
+      Serial.print(iv);
+      Serial.print("A, W=");
+      Serial.print(iw);
+      Serial.println("A");
+      Serial.println("  -> DRV8353 CSA may be saturated, faulted, or SPI gain incorrect");
+      last_warning_ms = millis();
+    }
+    return 0.0f;  // Return 0 to prevent interlock from using bogus data
+  }
+
   return (iu + iv + iw) / 3.0f;
 }
 

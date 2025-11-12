@@ -33,20 +33,24 @@ Refs: U6=LM5069-1, RS_IN (3.0 mΩ), TVS1=SMBJ33A, QREV (optional)
 
 ---
 
-## Bucks (LMR33630AF 24→5 V, TPS62133 5→3.3 V)
-Refs: U4=LMR33630AF, L4=10 µH, C4x=22 µF×4, C4IN=10 µF + 220 nF; U5=TPS62133, L5=2.2 µH, C5x=22 µF×2
+## Buck (LMR33630ADDAR 24→3.3 V Single-Stage)
+Refs: U4=LMR33630ADDAR, L4=10-22 µH (start with 10µH), C4x=22 µF×4, C4IN=10 µF + 220 nF
 
-- LMR33630 (24→5 V)
-  - VIN → `VBAT_PROT` via short trace; CIN: 10 µF to `GND` + 220 nF to `GND` near VIN.
-  - VOUT → net `5V`; COUT: 4×22 µF from `5V` to `GND` near IC/inductor.
-  - SW → one end of L4; other end of L4 → `5V`.
-  - BOOT 100 nF (internal note; if exposed) between BOOT and SW.
-  - VCC 1 µF to `GND` (per datasheet). Tie AGND/PGND appropriately; return to star.
-- TPS62133 (5→3.3 V)
-  - VIN → `5V` via short trace; CIN: ~10 µF to `GND` near VIN.
-  - VOUT → `3V3`; COUT: 2×22 µF to `GND` near IC/inductor.
-  - SW → one end of L5; other end of L5 → `3V3`.
-  - PG/MODE per default (optional pull‑ups/downs); route AGND to star.
+**Note**: 5V rail eliminated. Single-stage 24V→3.3V conversion simplifies design (1 IC vs 2 ICs, fewer components).
+
+- LMR33630ADDAR (24→3.3 V)
+  - VIN → `VBAT_PROT` via short trace; CIN: 10 µF + 220 nF to `GND` near VIN (keep HF cap close).
+  - VOUT → net `3V3`; COUT: 4×22 µF from `3V3` to `GND` near IC/inductor.
+  - SW → one end of L4 (net `SW_24V`); other end of L4 → `3V3`.
+  - BOOT: 100 nF between BOOT pin and SW pin (per datasheet Table 8-2).
+  - VCC: 1 µF to `GND` (internal LDO power).
+  - Feedback: Configure for 3.3V output using resistor divider per datasheet Table 8-1 (typically FB → 10kΩ to GND, VOUT → divider top).
+  - AGND/PGND: Tie appropriately; route ground return to star point at LM5069 sense.
+  - EN: Pull high to VIN or leave floating (internal pull-up); add RC delay if soft-start needed.
+  - SYNC: Leave floating (internal oscillator, 400 kHz).
+  - Thermal: **8× thermal vias (Ø0.3mm) under PowerPAD mandatory** (connect to Layer 2 GND plane).
+
+**Inductor Note**: 10µH provides 17% margin at 3A peak. Consider upgrading to 15-22µH for improved efficiency (could gain +2-3% efficiency for large 24V→3.3V voltage step).
 
 ---
 

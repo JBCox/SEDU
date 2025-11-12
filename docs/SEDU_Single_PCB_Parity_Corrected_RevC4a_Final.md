@@ -1,6 +1,6 @@
 # SEDU Single-PCB Feed Drill Controller — Rev C.4a Canonical Spec
 
-**Scope:** Single printed circuit board that replaces the legacy VESC + ESP32-C6 dev board + DRV8871 harness while preserving identical operator states, safety interlocks, and UI behavior for the aerospace positive-feed drill. Board size target ≤100 × 60 mm, VESC-class height.
+**Scope:** Single printed circuit board that replaces the legacy VESC + ESP32-C6 dev board + DRV8871 harness while preserving identical operator states, safety interlocks, and UI behavior for the aerospace positive-feed drill. Board size: **75 × 55 mm** (optimized from 80×60mm baseline; 14% area reduction), VESC-class height.
 
 ## 1. Locked Decisions (do not drift)
 - **Power during operation:** 6S (18–25.2 V) battery only. USB is programming-only and never allowed to power the drill hardware while in use.
@@ -16,15 +16,13 @@
 | Stage | Part(s) | Vin → Vout | Notes |
 |---|---|---|---|
 | Input protection | LM5069-1 (latch-off) + TVS SMBJ33A + reverse FET | Battery → protected bus | Hot-swap, OV/UV, programmable ILIM (≈18 A using 3.0 mΩ sense). dv/dt cap sized so inrush ≤0.5·ILIM. UV turn‑on ≈ 19.0 V (RUV 140k/10k), OV trip ≈ 29.2 V (ROV 221k/10k). |
-| Logic buck | LMR33630AF | 24 V → 5 V | 400 kHz synchronous buck, ~2 A headroom for MCU, LCD, DRV ICs. Tie LGND to star point near LM5069 sense. |
-| 3V3 rail | TPS62133 (preferred) | 5 V → 3.3 V | Feeds ESP32, LCD, logic. Place close to MCU; add test pad. |
-| USB-only rail | TPS22919 → TLV75533 | 5 V USB → 3.3 V | Only for flashing/debug. Back-feed protection handled by load switch. Radios disabled via firmware when USB rail is active. |
-| Actuator rail (option) | LMR33630AF | 24 V → 12 V | Optional. Only populate when using a 12 V actuator. Default build ties DRV8873 VM to protected 24 V via 0 Ω link; no 12 V buck populated. |
+| Logic buck | LMR33630ADDAR | 24 V → 3.3 V | **Single-stage** 400 kHz synchronous buck, 3A capable. Feeds ESP32, LCD, logic. **5V rail eliminated** for simpler design (1 IC vs 2). DRV8353 DVDD (5V) is internally generated. Tie LGND to star point near LM5069 sense. |
+| USB-only rail | TPS22919 → TLV75533 | 5 V USB → 3.3 V | Only for flashing/debug. Back-feed protection handled by load switch. Radios disabled via firmware when USB rail is active. **Note: Isolated from main 3.3V rail.** |
+| Actuator rail | DRV8873-Q1 VM pin | 24 V direct | DRV8873 powered directly from protected 24V (VM pin supports 4.5-38V). No separate buck needed. |
 
 ### Power Value Locks (Rev C.4b)
 - LM5069 variant: **LM5069-1 (latch‑off / latch-off)** is the default for safer fault handling. Use Rsense ≈ 55 mV / ILIM. Updated for motor peak loads: ILIM ≈ 18 A → Rsense ≈ 3.0 mΩ → stuff **3.0 mΩ**, **≥3 W**, **1%**, **4‑terminal Kelvin** (e.g., HoLRS2512-3W-3mR-1%). Circuit breaker ≈ 105 mV / Rsense (≈35 A). Start with **C_dv/dt = 33 nF** and adjust so measured inrush ≤ ~0.5·ILIM.
-- LMR33630 (24→5 V @ ~400 kHz): L = 8 µH; COUT ≈ 4 × 22 µF X7R (≥10 V); CIN ≥ 10 µF + 220 nF HF; BOOT = 100 nF; VCC = 1 µF; provide copper/vias (P_loss ≈ 0.87 W @ 5 V/2 A, η≈92%).
-- TPS62133 (5→3.3 V): L = 2.2 µH start; COUT = 22–44 µF X7R; CIN ≈ 10 µF; follow TI ripple tables.
+- LMR33630ADDAR (24→3.3 V @ 400 kHz **single-stage**): L = 10-22 µH (start with 10µH for prototype, consider 15-22µH for better efficiency); COUT ≈ 4 × 22 µF X7R (≥10 V); CIN ≥ 10 µF + 220 nF HF; BOOT = 100 nF; VCC = 1 µF; provide copper/vias (P_loss ≈ 1.35 W @ 3.3 V/3 A, η≈88%). **5V rail eliminated** - simpler design (1 IC vs 2), fewer components.
 - Policy lock: "TPS22919 → TLV75533 only; USB never powers the tool; radios forced off in USB‑only mode."
 
 ## 3. Safety & Legacy Parity Requirements
@@ -82,15 +80,15 @@
 - Cable guidance: keep each cable ≤200 mm; use JST‑GH/PH or equivalent locking connectors. Route away from motor phase nodes. Add ESD arrays on lines that exit the enclosure (USB, BTN_SENSE, START/STOP, SPI if exposed).
 
 ## 7. Mechanical Envelope & Mounting
-- Board size target: **≤ 80 × 60 mm** first spin, smaller if ERC/DRC/thermals allow.
-- Layers: **4‑layer** recommended (L1 signals + short pours; L2 solid GND; L3 5V/3V3 planes and sense stitching; L4 signals/returns).
-- Mounting: **4× M3** holes (3.2 mm finished) with ≥1.5 mm keep‑out annulus; nominal centers at (4,4), (width−4,4), (4,height−4), (width−4,height−4). Tented vias near holes.
+- Board size target: **75 × 55 mm** (optimized from 80×60mm baseline; 14% area reduction leveraging 5V rail elimination).
+- Layers: **4‑layer** recommended (L1 signals + short pours; L2 solid GND; L3 3V3 plane and sense stitching **(5V plane removed)**; L4 signals/returns).
+- Mounting: **4× M3** holes (3.2 mm finished) with ≥1.5 mm keep‑out annulus; nominal centers at (4,4), (71,4), (4,51), (71,51). Tented vias near holes.
 - Keep‑outs: ESP32 antenna per datasheet; LCD and UI connectors away from high di/dt phase regions; star ground at battery‑negative shunt.
 
 ## 7. Programming & Debug
 - Default programming via USB-C CDC bootloader. If USB is removed, expose a Tag-Connect SWD/JTAG header tied to EN/BOOT/USB pins per Espressif design guide.
 - When powered by USB-only rail, firmware disables motor/actuator outputs, RF subsystems, and indicates “USB DEV MODE” on LCD.
-- Maintain test pads for 3V3, 5V, 24V, RX, TX, BTN_SENSE.
+- Maintain test pads for 3V3, 24V, RX, TX, BTN_SENSE, IPROPI. **(5V test pad removed - rail eliminated)**
 
 ## 8. Bring-Up Checklist (Summary)
 1. Unpowered: continuity, correct orientation, verify star ground nodes.

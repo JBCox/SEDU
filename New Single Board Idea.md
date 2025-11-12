@@ -1,6 +1,14 @@
 
 # SEDU Single‑PCB Feed Drill Control Board — Parity‑Corrected **Rev C.4a (Final)**
 
+> **⚠️ OBSOLETE DOCUMENT**
+>
+> This document describes the initial two-stage power design (24V→5V→3.3V) which has been **SUPERSEDED** as of 2025-11-12.
+>
+> **Current design**: Single-stage 24V→3.3V conversion, board size 75×55mm
+>
+> See `5V_RAIL_ELIMINATION_SUMMARY.md` for details on the design change.
+
 **Scope:** One‑board, Arduino‑programmable controller replacing VESC + dev board + loose H‑bridge. Keeps Wi‑Fi/BLE, LCD, button UI, actuator, and identical tool behavior. **Form factor cap:** ≤ **100 × 60 mm**, VESC‑class Z‑height. (Authoritative values live in `docs/SEDU_Single_PCB_Parity_Corrected_RevC4a_Final.md`; this file summarizes the same data for quick reference.)
 
 **Major deltas vs Rev C.4:**  

@@ -72,21 +72,20 @@ This report details the key specifications and project-specific roles of the pri
 
 ## 4. Power Management
 
-### 4.1 24V to 5V Buck Converter
-- **Component:** `LMR33630AF`
-- **Function:** The primary regulator, stepping the 24V battery input down to a stable 5V rail to power the secondary regulator and other 5V peripherals.
+### 4.1 24V to 3.3V Buck Converter (Single-Stage)
+- **Component:** `LMR33630ADDAR`
+- **Function:** The primary and sole regulator, stepping the 24V battery input directly down to a stable 3.3V rail to power the ESP32-S3 and all logic-level components. The 5V intermediate rail has been eliminated to reduce component count, board area, and power loss.
 - **Documentation:** `LMR33630AF_datasheet.pdf`
-- **Project-Specific Info:** Chosen for its high efficiency (~92% at our expected load), which minimizes heat dissipation. Its 3A output capacity provides ample current for the entire logic system.
+- **Project-Specific Info:** Chosen for its high efficiency (~92% at our expected load), which minimizes heat dissipation. Its 3A output capacity provides ample current for the entire logic system. Direct 24V→3.3V conversion simplifies the power architecture and improves overall efficiency by eliminating the cascaded conversion losses of the previous two-stage design.
 
-### 4.2 5V to 3.3V Buck Converter
-- **Component:** `TPS62133`
-- **Function:** Steps the 5V rail down to the 3.3V rail required by the ESP32-S3 and most other logic-level components.
-- **Documentation:** `TPS62133_datasheet.pdf`
-- **Project-Specific Info:** This is a high-efficiency (~93%) synchronous buck converter, critical for minimizing power loss and ensuring a clean, stable 3.3V supply for the sensitive MCU and its peripherals.
+### 4.2 5V to 3.3V Buck Converter (REMOVED)
+- **Component:** `TPS62133` - **ELIMINATED in Rev C.4a+**
+- **Status:** This component and the entire 5V intermediate rail have been removed from the design. The LMR33630ADDAR now provides 3.3V directly from the 24V battery rail in a single-stage conversion.
+- **Rationale:** Eliminating the two-stage power conversion (24V→5V→3.3V) reduces BOM count, board area by ~75×55mm optimization, and cumulative conversion losses. The direct 24V→3.3V approach is more efficient and simplifies the power architecture.
 
 ### 4.3 USB Power Path
 - **Components:** `TPS22919` (load switch) & `TLV75533` (3.3 V LDO)
-- **Function:** VBUS feeds the TPS22919, which isolates the USB rail from the main 5 V buck. When enabled, the TLV75533 provides a 3.3 V/250 mA rail dedicated to the ESP32 for programming with the main battery disconnected.
+- **Function:** VBUS feeds the TPS22919, which isolates the USB rail from the main 3.3V buck. When enabled, the TLV75533 provides a 3.3 V/250 mA rail dedicated to the ESP32 for programming with the main battery disconnected.
 - **Documentation:** `TPS22919_datasheet.pdf`, TLV75533 datasheet (note: PDFs stored at repo root per AGENTS.md).
 - **Project-Specific Info:** Firmware disables RF subsystems and power stages whenever this rail is active. This path must **never** be used to operate the drill; it is for flashing/debug only (USB never powers the tool).
 

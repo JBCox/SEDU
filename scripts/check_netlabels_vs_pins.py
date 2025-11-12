@@ -16,8 +16,8 @@ ROOT = pathlib.Path(__file__).resolve().parents[1]
 NETS = ROOT / "hardware" / "Net_Labels.csv"
 
 REQUIRED_NETS = {
-    # Power
-    "VBAT", "VBAT_PROT", "5V", "3V3", "GND",
+    # Power (5V removed - rail eliminated)
+    "VBAT", "VBAT_PROT", "3V3", "GND",
     # USB
     "USB_D-", "USB_D+",
     # SPI

@@ -25,6 +25,12 @@ void writeRegister(uint8_t addr, uint16_t data) {
   xfer16(frame);
 }
 
+uint16_t readRegister(uint8_t addr) {
+  // DRV8353RS read frame: bit 15=1 (read), bits 14-11=addr, bits 10-0=unused
+  const uint16_t frame = (1U << 15) | ((addr & 0x0F) << 11);
+  return xfer16(frame) & 0x07FF;  // Return 11-bit data field
+}
+
 }  // namespace
 
 void init() {
@@ -41,6 +47,24 @@ void configure() {
   const uint16_t csa_ctrl = (0b10 << 6) | (0b111 << 3);  // Gain=20V/V, all CSA on
   writeRegister(0x06, csa_ctrl);
 
+  delay(1);  // Allow settings to take effect
+
+  // CRITICAL: Verify CSA gain configuration (Issue #2 from 5-agent analysis)
+  // If SPI fails, gain remains at default 10V/V → motor current readings 50% wrong
+  const uint16_t readback = readRegister(0x06);
+  const uint16_t gain_bits = (readback >> 6) & 0b11;
+  if (gain_bits != 0b10) {
+    Serial.println("[FATAL] DRV8353 CSA gain configuration FAILED!");
+    Serial.print("  Expected: 0b10 (20V/V), Got: 0b");
+    Serial.println(gain_bits, BIN);
+    Serial.print("  Full register readback: 0x");
+    Serial.println(readback, HEX);
+    Serial.println("  HALTING: Motor current readings would be incorrect");
+    Serial.println("  Check SPI wiring (CS=GPIO22, SCK=GPIO18, MOSI=GPIO17, MISO=GPIO21)");
+    while(1) { delay(100); }  // Halt firmware - SPI communication broken
+  }
+  Serial.println("[OK] DRV8353 CSA gain verified: 20V/V");
+
   // Register 0x03 (Driver Control): Gate drive strength = moderate (default safe)
   // Keep defaults unless tuning required during bring-up
   // writeRegister(0x03, 0x0000);  // Optional: configure if needed
@@ -52,8 +76,6 @@ void configure() {
   // Register 0x05 (Gate Drive LS): Configure low-side gate drive and OCP
   // Keep defaults unless tuning required
   // writeRegister(0x05, 0x0000);  // Optional
-
-  delay(1);  // Allow settings to take effect
 }
 
 // DRV8353RS frame format specifics vary; perform generic 16-bit transfers to capture raw status.

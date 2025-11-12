@@ -54,10 +54,11 @@ python scripts/verify_power_calcs.py     # Power calculations verification
 - ADC locks: Battery divider `140 kΩ / 10.0 kΩ (1%)` with 1 kΩ series + 0.1 µF at the pin; ladder on `GPIO4` with fault bands `<0.20 V` and `>3.40 V`.
 - SPI: DRV CS `GPIO22`; LCD CS `GPIO16`; `SCK=GPIO18`, `MOSI=GPIO17`, `MISO=GPIO21` (write-only LCD).  
 
-Mechanical/PCB locks (first spin):  
-- Board outline target: **80 × 60 mm**; 4 × M3 holes (3.2 mm finished) at approx. (4,4), (76,4), (4,56), (76,56).  
-- 4-layer stack recommended; antenna keep-out per Espressif.  
-- 12 V actuator buck footprints: **omitted** to minimize area (24 V actuator default).  
+Mechanical/PCB locks (first spin):
+- Board outline target: **75 × 55 mm** (optimized from 80×60mm; 14% area reduction); 4 × M3 holes (3.2 mm finished) at (4,4), (71,4), (4,51), (71,51).
+- 4-layer stack recommended; antenna keep-out per Espressif.
+- 12 V actuator buck footprints: **omitted** to minimize area (24 V actuator default).
+- 5V rail: **eliminated** - single-stage 24V→3.3V conversion (LMR33630ADDAR only; TPS62133 removed).  
 
 Bring-up confirmations (locked values; verify on bench):
 - LM5069 variant: **LM5069-1 (latch-off)** is locked. Start with **C_dv/dt = 33 nF**; adjust to keep inrush ≤ ~0.5×ILIM.  

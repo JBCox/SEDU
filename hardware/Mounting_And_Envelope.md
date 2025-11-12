@@ -1,25 +1,26 @@
 # Mounting & Envelope
 
 ## Current Plan (Rev C.4b)
-- **Initial layout**: 80 × 60 mm board outline
-- **Optimization**: After placement and routing are complete, evaluate actual component extents and shrink board to fit + margin
-- **Philosophy**: Design for function first, optimize size second
+- **Optimized layout**: **75 × 55 mm board outline** (14% area reduction from 80×60mm baseline)
+- **Optimization basis**: Leverages 5V rail elimination (~12-15mm space savings) + thermal/routing analysis
+- **Philosophy**: Balanced size reduction with adequate thermal margin (470mm²/W copper area)
 
 ## Board Outline
-- Start with 80 × 60 mm for component placement and routing
-- After layout is functionally complete, measure actual bounding box of components + critical routing
-- Shrink outline to actual size + 3-5mm margin per edge (if space allows)
-- Final size will be determined by thermal, EMI, and routing requirements (likely 65-75mm × 50-58mm)
+- **Finalized dimensions**: **75 × 55 mm**
+- Thermal analysis confirms adequate heat dissipation for 8.5W typical power (12W peak)
+- Adequate routing channels for 4mm battery traces + 3mm phase traces
+- Component placement zones fit with 3-5mm margin per edge
+- **Critical requirement**: Mandatory 8× thermal vias (Ø0.3mm) under high-power ICs (DRV8873, LMR33630, DRV8353RS)
 
 ## Mounting Holes
 - Mounting holes are NOT constrained by enclosure - tool is designed around board
-- 4 × M3 (3.2 mm finished), positions TBD after board size is optimized
-- Place holes based on actual component placement, thermal zones, and mechanical stress points
+- 4 × M3 (3.2 mm finished) at positions: **(4, 4), (71, 4), (4, 51), (71, 51) mm** from board corner
+- Positions optimized for 75×55mm board based on component placement, thermal zones, and mechanical stress
 - Keep-out around holes: ≥1.5 mm annulus with no copper; tent vias near holes
 - Avoid placing holes under hot components or in critical signal paths
 
 ## Stack-Up
-- 4-layer recommended: L1 signals/short pours; L2 solid GND; L3 5V/3V3 planes and sense stitching; L4 signals/returns.
+- 4-layer recommended: L1 signals/short pours; L2 solid GND; L3 3V3 plane and sense stitching **(5V removed)**; L4 signals/returns.
 
 ## Keep-Outs & Constraints
 - ESP32 antenna keep-out per datasheet: ≥15 mm forward, ≥5 mm perimeter; no copper/dense routing under antenna
