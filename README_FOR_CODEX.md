@@ -26,7 +26,7 @@ Any change from the old VESC+DRV8871 harness (e.g., DRV8873 upgrade, discrete St
 - Keep **Wi‑Fi + BLE** available (ESP32 family), **Arduino‑programmable**.
 - UI: **Start/Stop** buttons; **LCD shows battery % + motor RPM/current**; basic Ready/Run/Fault states.
 - **Battery (24 V) is the only power during use.** USB‑C is optional and for **programming only**.
-- **One PCB** (**75 × 55 mm** optimized from 80×60mm baseline) unless explicitly split in a future rev with trade‑offs.
+- **One PCB** (**80 × 50 mm** optimized from 80×60mm baseline via 75×55mm intermediate, fits credit card 85.6×54mm) unless explicitly split in a future rev with trade‑offs.
 
 ---
 
@@ -41,7 +41,7 @@ Any change from the old VESC+DRV8871 harness (e.g., DRV8873 upgrade, discrete St
 **Motor stage**  
 - **DRV8353RS** 3‑phase gate driver (SPI + integrated CSAs).  
 - 6× MOSFETs, 60 V class, ≤ 2 mΩ Rds(on) typical.  
-- **Shunts:** 3 × **2 mΩ, 2512, pulse‑rated**, true Kelvin; **CSA gain = 20 V/V**.  
+- **Shunts:** 3 × **2 mΩ, 2512, pulse‑rated** (CSS2H-2512K-2L00F, 5W verified, K suffix NOT R), true Kelvin; **CSA gain = 20 V/V**.  
 - **FOC‑ready:** CSAs wired to ADC1 with **56–100 Ω + 470 pF** anti‑alias at MCU pin.  
 - Default **6‑step + Halls**; FOC path available in firmware.
 
@@ -187,7 +187,7 @@ Codex should paste the outputs and say **PASS/FAIL** with a short fix plan if FA
 **A. Create KiCad skeleton**
 ```
 Create 'hardware/SEDU_PCB.kicad_pro' with a blank board + schematic; add hierarchical sheets:
-Power_In (LM5069, TVS, shunt), Bucks (LMR33630, TPS62133), USB_Prog (TPS22919→TLV75533),
+Power_In (LM5069, TVS, shunt), Bucks (LMR33630ADDAR 24V→3.3V single-stage), USB_Prog (TPS22919→TLV75533),
 MCU (ESP32‑S3 module, USB-C, ESD), Motor_Driver (DRV8353RS + FETs + shunts),
 Actuator (DRV8873‑Q1), LCD_Connector (GC9A01 SPI, backlight), IO_UI (buttons, ladder, buzzer/LEDs).
 Create net labels per the canonical pin names and export a netlist.

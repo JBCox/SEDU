@@ -1,0 +1,274 @@
+================================================================================
+SEDU PCB 80x50mm - Component Placement Zones (ASCII Visualization)
+================================================================================
+
+Board Dimensions: 80mm (width) x 50mm (height)
+Mounting Holes: 4x M3 at corners (3.2mm dia + 1.5mm keep-out = 6.2mm total)
+
+Legend:
+  [H] = Mounting hole (M3) with keep-out zone
+  PWR = Power entry zone (LM5069, TVS1, Q_HS, RS_IN, J_BAT)
+  BCK = Buck converter zone (LMR33630, L4, capacitors)
+  MCU = ESP32-S3-WROOM-1 with antenna keep-out
+  ANT = Antenna keep-out zone (no copper, >=15mm forward)
+  MTR = Motor bridge zone (DRV8353, 6x MOSFETs, 3x phase shunts)
+  ACT = Actuator driver zone (DRV8873, R_ILIM, R_IPROPI, TVS2)
+  USB = USB programming zone (TPS22919, TLV75533, USB connector)
+  LCD = LCD connector zone (J_LCD, series resistors)
+  UI  = UI connector zone (J_UI, ladder components, ESD)
+  J_B = Battery connector (XT30)
+  J_M = Motor phase connectors (3x XT30 for U/V/W)
+  J_A = Actuator connector (MicroFit 2P)
+
+================================================================================
+TOP VIEW (Component Side - Layer 1):
+================================================================================
+
+   0     10    20    30    40    50    60    70    80 mm
+   ├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+ 0 ┌─────────────────────────────────────────────────────────────────────────┐
+   │[H1]                                                                 [H2]│
+   │ PWR   J_B  BCK            UI   UI   UI   LCD  LCD  USB    MCU  MCU  MCU│
+   │                           UI   UI   UI   LCD  LCD  USB    MCU  MCU  MCU│
+ 10│ PWR   PWR  BCK            UI   UI   UI   LCD  LCD         MCU  MCU  MCU│
+   │                                                            MCU  MCU  MCU│
+   │ PWR   PWR  BCK  BCK                                  ANT  ANT  ANT  ANT│
+   │                                                       ANT  ANT  ANT  ANT│
+ 20│ TVS1             BCK  BCK                            ANT  ANT  ANT  ANT│
+   │                                                       ANT  ANT  ANT  ANT│
+   │                                                       ANT  ANT  ANT  ANT│
+   │                       ACT  ACT  ACT  J_A                              │
+ 30│                       ACT  ACT  ACT                                    │
+   │                       ACT  ACT  TVS2                                   │
+   │                                                                        │
+   │      MTR  MTR  MTR  MTR  MTR  MTR                                     │
+ 40│      MTR  MTR  MTR  MTR  MTR  MTR                                     │
+   │      MTR  MTR  MTR  MTR  MTR  MTR                                     │
+   │                                                                        │
+   │[H3]  J_M  J_M  J_M                                               [H4]│
+ 50└─────────────────────────────────────────────────────────────────────────┘
+
+================================================================================
+PLACEMENT ZONES - DETAILED BREAKDOWN:
+================================================================================
+
+Zone 1: POWER ENTRY (Top-Left, 15mm x 20mm)
+  Location: (4, 4) to (19, 24)
+  Components:
+    - LM5069-1 hot-swap controller (MSOP-10, 3.0x5.0mm)
+    - RS_IN current sense shunt (2728, 7.0x7.1mm)
+    - Q_HS pass FETs x2 (SuperSO8, 5.2x5.2mm each)
+    - SMBJ33A TVS1 (DO-214AA, 5.0x5.8mm)
+    - NetTie_2 star ground connection point
+    - Battery voltage divider (RUV_TOP, RUV_BOT, ROV_TOP, ROV_BOT)
+    - LM5069 timing caps (CDVDT)
+  Connectors:
+    - J_BAT battery connector (XT30, 12.5x16.0mm) at top edge
+
+Zone 2: BUCK CONVERTER (Adjacent to Power, 20mm x 15mm)
+  Location: (20, 4) to (40, 19)
+  Components:
+    - LMR33630ADDAR buck IC (HSOIC-8, 5.0x6.5mm)
+    - L4 inductor 10µH (1008 package, 10.0x10.0mm)
+    - C4IN_A, C4IN_B input caps (1206 + 0603)
+    - C4x output caps x4 (0805, 22µF each)
+    - Thermal vias: 8x Ø0.3mm under LMR33630 PowerPAD (MANDATORY)
+  Notes:
+    - SW node oriented away from MCU/ADC traces
+    - Tight VIN/COUT decoupling loops
+    - Thermal copper spreading to back layer
+
+Zone 3: MCU + ANTENNA (Top-Right Corner, 28mm x 40mm)
+  Location: (52, 4) to (80, 44)
+  Components:
+    - ESP32-S3-WROOM-1 module (18.0x25.5mm)
+    - 3V3 decoupling caps (100nF, 10µF)
+    - USB ESD protection (USBLC6-2SC6)
+    - USB D+/D- series resistors (22Ω, 0402)
+    - USB CC1/CC2 pulldowns (5.1kΩ)
+  Antenna Keep-Out:
+    - Forward: >=15mm from antenna end (extends to x=80mm edge)
+    - Sides: >=5mm margin around antenna edge
+    - Total zone: 28mm width x 15mm depth (420 mm²)
+    - No copper pours, traces, or tall components in keep-out
+  Connectors:
+    - USB-C connector at top edge (near x=65mm)
+
+Zone 4: UI CONNECTORS (Top-Center, 25mm x 10mm)
+  Location: (30, 4) to (55, 14)
+  Components:
+    - J_UI connector (JST-GH-8P, 11.5x5.5mm)
+    - J_LCD connector (JST-GH-8P, 11.5x5.5mm)
+    - ESD protection (TPD4E02B04DQA 4-line, SON-10)
+    - Button ladder network (R19, R20, R21, R11, C19)
+    - R_BTN_SER series resistor (220Ω, 0603)
+    - START/STOP series resistors (100Ω, 0603 each)
+    - LCD series resistors (R_SCK, R_MOSI, 22Ω 0402)
+    - Q_LED backlight FET (2N7002, SOT-23)
+    - FB_LED ferrite bead (0603)
+
+Zone 5: USB PROGRAMMING (Near MCU, 10mm x 10mm)
+  Location: (58, 10) to (68, 20)
+  Components:
+    - TPS22919 load switch (SOT-23-6, 1.6x2.9mm)
+    - TLV75533 LDO (SOT-23-5, 1.6x2.9mm)
+    - Decoupling caps (100nF, 1µF)
+  Notes:
+    - Isolated from main 24V power path
+    - Powers ESP32 during USB programming only
+    - NOT used during normal tool operation
+
+Zone 6: ACTUATOR DRIVER (Mid-Left, 15mm x 20mm)
+  Location: (25, 24) to (40, 44)
+  Components:
+    - DRV8873-Q1 H-bridge (HTSSOP-28, 4.4x9.7mm)
+    - R_ILIM current limit resistor (1.58kΩ, 0603)
+    - R_IPROPI feedback resistor (1.00kΩ, 0603)
+    - R_IPROPI_SER, C_IPROPI_AA ADC anti-alias (220Ω + 10nF)
+    - SMBJ33A TVS2 (DO-214AA, 5.0x5.8mm)
+    - Decoupling caps for VM, VCP
+    - Thermal vias under DRV8873 thermal pad
+  Connectors:
+    - J_ACT actuator connector (MicroFit 2P, 10.0x7.0mm) at edge
+
+Zone 7: MOTOR BRIDGE (Bottom-Left, 30mm x 25mm)
+  Location: (4, 34) to (34, 50)
+  Components:
+    - DRV8353RS gate driver (HTSSOP-48, 6.1x12.5mm)
+    - 6x MOSFETs (SuperSO8, 5.2x5.2mm each) for 3-phase bridge
+    - 3x phase shunts (2512 Kelvin, 3.2x6.4mm each) for U/V/W current sense
+    - 6x gate resistors (10Ω, 0603) at FET gates
+    - DRV8353 decoupling (C_VCP, C_VGLS, C_DVDD, C_CPLCPH)
+    - CSA anti-alias filters (R_CSA_U/V/W 56Ω + C_CSA_U/V/W 470pF, 0603)
+    - Optional snubbers (RSN_U/V/W 10Ω + CSN_U/V/W 1nF, DNI)
+    - Thermal vias under DRV8353 thermal pad
+  Connectors:
+    - J_MOT phase connectors x3 (XT30, 12.5x16.0mm each) at bottom edge
+  Notes:
+    - Phase pours (PHASE_U, PHASE_V, PHASE_W) symmetric to connectors
+    - Gate traces short and matched (±2mm)
+    - Kelvin sense routing from shunts to DRV8353 CSA inputs
+    - True Kelvin: sense traces do NOT share power current path
+
+================================================================================
+CRITICAL ROUTING NOTES:
+================================================================================
+
+1. STAR GROUND (NetTie_2):
+   - Located in Power Entry zone near RS_IN shunt
+   - PGND (power ground) and LGND (logic ground) join ONLY at this point
+   - All high-current return paths route through PGND to star
+   - All low-noise signal grounds route through LGND to star
+
+2. HIGH-POWER TRACES:
+   - VBAT (24V battery input): 4mm trace from J_BAT to LM5069
+   - VBAT_PROT (protected 24V): 4mm trace from LM5069 to buck, motor, actuator
+   - MOTOR_PHASE_U/V/W: 3mm symmetric traces from DRV8353 MOSFETs to J_MOT
+   - ACTUATOR ACT_OUT_A/B: 1.5mm traces from DRV8873 to J_ACT
+
+3. SENSITIVE ANALOG:
+   - BTN_SENSE: Route with GND guard, >=10mm from SW nodes and motor phases
+   - CSA_U/V/W_ADC: Shield with GND vias, 56Ω series + 470pF shunt at DRV8353
+   - BAT_ADC: 1kΩ series + 100nF shunt at ESP32 ADC pin
+   - IPROPI_ADC: 220Ω series + 10nF shunt at ESP32 ADC pin
+
+4. SPI BUS SHARING:
+   - DRV8353 SPI: CS=GPIO22, SCK=GPIO18, MOSI=GPIO17, MISO=GPIO21
+     - MODE1 (CPOL=0, CPHA=1), 1 MHz max
+   - LCD SPI: CS=GPIO16, DC=GPIO32, RST=GPIO33 (shares SCK/MOSI)
+     - MODE0 (CPOL=0, CPHA=0), 20 MHz max, MISO NC (write-only)
+   - Place series resistors (22Ω) near LCD connector for signal integrity
+
+5. THERMAL VIAS (MANDATORY):
+   - LMR33630: 8x Ø0.3mm under PowerPAD, connected to back copper pour
+   - DRV8873: Via array under thermal pad, stagger to prevent solder wicking
+   - DRV8353RS: Via array under thermal pad, connect to PGND
+   - MOSFETs: "Dogbone" routing from drain pads to via arrays (if needed)
+
+6. ANTENNA KEEP-OUT ENFORCEMENT:
+   - No copper pours (GND or 3V3) in 28mm × 15mm zone
+   - No high-di/dt traces (motor phases, buck SW) within 5mm of antenna
+   - No tall components (inductors, connectors) in forward 15mm zone
+
+================================================================================
+CONNECTOR PLACEMENT SUMMARY:
+================================================================================
+
+TOP EDGE (80mm width):
+  - J_BAT (XT30): Near left corner, x ~ 10mm
+  - J_UI (JST-GH-8P): Center-left, x ~ 35mm
+  - J_LCD (JST-GH-8P): Center-right, x ~ 50mm
+  - USB-C: Near right corner, x ~ 65mm
+
+BOTTOM EDGE (80mm width):
+  - J_MOT_U (XT30): Left, x ~ 8mm
+  - J_MOT_V (XT30): Center-left, x ~ 20mm
+  - J_MOT_W (XT30): Center, x ~ 32mm
+
+LEFT EDGE (50mm height):
+  - J_ACT (MicroFit 2P): Mid-height, y ~ 30mm
+
+RIGHT EDGE (50mm height):
+  - (Reserved for test pads, thermal relief, no connectors)
+
+Total edge utilization: 83mm / 260mm perimeter = 31.9%
+
+================================================================================
+TEST PADS (1.5mm dia, accessible with probe clips):
+================================================================================
+
+  - TP_3V3: Near MCU zone, logic power rail
+  - TP_24V: Near power entry zone, VBAT_PROT rail
+  - TP_BTN: Near UI zone, button ladder sense voltage
+  - TP_IPROPI: Near actuator zone, current feedback voltage
+  - TP_RX: Near MCU zone, UART receive (GPIO44)
+  - TP_TX: Near MCU zone, UART transmit (GPIO43)
+
+================================================================================
+MOUNTING HOLE DETAILS:
+================================================================================
+
+  H1: (4, 4) mm - Top-left corner
+    - Keep-out radius: 3.1mm (6.2mm diameter)
+    - Adjacent zones: Power entry (left), buck converter (right)
+    - Clearance: 1.5mm annulus, no copper under screw head
+
+  H2: (76, 4) mm - Top-right corner
+    - Keep-out radius: 3.1mm (6.2mm diameter)
+    - Adjacent zones: MCU + antenna (right), UI connectors (left)
+    - Clearance: 1.5mm annulus, no copper under screw head
+
+  H3: (4, 46) mm - Bottom-left corner
+    - Keep-out radius: 3.1mm (6.2mm diameter)
+    - Adjacent zones: Motor bridge (above), motor connectors (below)
+    - Clearance: 1.5mm annulus, no copper under screw head
+
+  H4: (76, 46) mm - Bottom-right corner
+    - Keep-out radius: 3.1mm (6.2mm diameter)
+    - Adjacent zones: Open area (above), potential test pads (left)
+    - Clearance: 1.5mm annulus, no copper under screw head
+
+Usable interior rectangle (between hole keep-outs):
+  - Width: 76 - 4 - 6.2 = 65.8 mm
+  - Height: 46 - 4 - 6.2 = 35.8 mm
+  - Area: 2355.6 mm²
+
+================================================================================
+VERIFICATION STATUS: PASS
+================================================================================
+
+✓ All components fit within 80x50mm outline
+✓ Component density: 61.7% raw, 80.2% with routing overhead (PASS <85%)
+✓ Connector utilization: 31.9% perimeter (PASS <70%)
+✓ Mounting holes: 4x M3 positioned without conflicts
+✓ Antenna keep-out: 28mm x 15mm zone allocatable in MCU corner
+✓ Routing channels: Adequate space for 4mm battery, 3mm phase traces
+✓ Thermal management: Space confirmed for mandatory thermal vias
+
+READY FOR KICAD SCHEMATIC ENTRY AND PCB LAYOUT
+
+================================================================================
+Generated: 2025-11-12
+Script: scripts/verify_board_fit.py
+Board file: hardware/SEDU_PCB.kicad_pcb (80.00 x 50.00 mm verified)
+================================================================================

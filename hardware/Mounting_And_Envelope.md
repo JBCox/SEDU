@@ -1,12 +1,12 @@
 # Mounting & Envelope
 
 ## Current Plan (Rev C.4b)
-- **Optimized layout**: **75 × 55 mm board outline** (14% area reduction from 80×60mm baseline)
+- **Optimized layout**: **80 × 50 mm board outline** (17% area reduction from 80×60mm baseline, fits credit card footprint 85.6×54mm)
 - **Optimization basis**: Leverages 5V rail elimination (~12-15mm space savings) + thermal/routing analysis
 - **Philosophy**: Balanced size reduction with adequate thermal margin (470mm²/W copper area)
 
 ## Board Outline
-- **Finalized dimensions**: **75 × 55 mm**
+- **Finalized dimensions**: **80 × 50 mm**
 - Thermal analysis confirms adequate heat dissipation for 8.5W typical power (12W peak)
 - Adequate routing channels for 4mm battery traces + 3mm phase traces
 - Component placement zones fit with 3-5mm margin per edge
@@ -14,8 +14,8 @@
 
 ## Mounting Holes
 - Mounting holes are NOT constrained by enclosure - tool is designed around board
-- 4 × M3 (3.2 mm finished) at positions: **(4, 4), (71, 4), (4, 51), (71, 51) mm** from board corner
-- Positions optimized for 75×55mm board based on component placement, thermal zones, and mechanical stress
+- 4 × M3 (3.2 mm finished) at positions: **(4, 4), (76, 4), (4, 46), (76, 46) mm** from board corner
+- Positions optimized for 80×50mm board based on component placement, thermal zones, and mechanical stress
 - Keep-out around holes: ≥1.5 mm annulus with no copper; tent vias near holes
 - Avoid placing holes under hot components or in critical signal paths
 

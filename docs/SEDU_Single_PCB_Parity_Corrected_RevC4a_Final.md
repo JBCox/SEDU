@@ -1,6 +1,6 @@
 # SEDU Single-PCB Feed Drill Controller — Rev C.4a Canonical Spec
 
-**Scope:** Single printed circuit board that replaces the legacy VESC + ESP32-C6 dev board + DRV8871 harness while preserving identical operator states, safety interlocks, and UI behavior for the aerospace positive-feed drill. Board size: **75 × 55 mm** (optimized from 80×60mm baseline; 14% area reduction), VESC-class height.
+**Scope:** Single printed circuit board that replaces the legacy VESC + ESP32-C6 dev board + DRV8871 harness while preserving identical operator states, safety interlocks, and UI behavior for the aerospace positive-feed drill. Board size: **80 × 50 mm** (optimized from 80×60mm baseline via 75×55mm intermediate; 17% area reduction), fits within credit card footprint.
 
 ## 1. Locked Decisions (do not drift)
 - **Power during operation:** 6S (18–25.2 V) battery only. USB is programming-only and never allowed to power the drill hardware while in use.
@@ -54,7 +54,7 @@
 ## 5. Actuator & Button Interface
 - DRV8873-Q1 PH/EN version powered from protected 24 V bus; ILIM resistor set to 110–120% of actuator continuous rating. Include SMBJ33A clamp on the actuator supply.
 - ESP32 GPIO23 (START) drives DRV8873 enable path; GPIO24 (STOP_NC) provides redundant hardware disable or gate for firmware logic.
-- Two-button ladder values: R19=10 kΩ pull-up, R20=100 kΩ auxiliary pull-up, Start leg R21=5 kΩ to GND (NO), Stop leg R11=10 kΩ to GND (NC), C19=100 nF to GND. Firmware treats unspecified voltages (1.00–1.55 V and 2.10–2.60 V) as hard faults; <0.20 V is fault-low and >3.40 V is fault-open.
+- Two-button ladder values: R19=10 kΩ pull-up, R20=100 kΩ auxiliary pull-up, Start leg R21=5.1 kΩ to GND (NO), Stop leg R11=10 kΩ to GND (NC), C19=100 nF to GND. Firmware treats unspecified voltages (1.00–1.55 V and 2.10–2.60 V) as hard faults; <0.20 V is fault-low and >3.40 V is fault-open.
 
 ### DRV8873‑Q1 Current Feedback (Rev C.4b)
 - Use IPROPI mirror or ITRIP levels. Size R_IPROPI so V_IPROPI ≤ 3.3 V across expected current (k≈1100 A/A). Example: 3 A ⇒ R_IPROPI ≤ ~1.21 kΩ; conservative 910 Ω–1.0 kΩ gives ~2.7–3.0 V at 3 A.
@@ -80,9 +80,9 @@
 - Cable guidance: keep each cable ≤200 mm; use JST‑GH/PH or equivalent locking connectors. Route away from motor phase nodes. Add ESD arrays on lines that exit the enclosure (USB, BTN_SENSE, START/STOP, SPI if exposed).
 
 ## 7. Mechanical Envelope & Mounting
-- Board size target: **75 × 55 mm** (optimized from 80×60mm baseline; 14% area reduction leveraging 5V rail elimination).
+- Board size target: **80 × 50 mm** (optimized from 80×60mm baseline via 75×55mm intermediate; 17% area reduction, fits within credit card footprint 85.6×54mm).
 - Layers: **4‑layer** recommended (L1 signals + short pours; L2 solid GND; L3 3V3 plane and sense stitching **(5V plane removed)**; L4 signals/returns).
-- Mounting: **4× M3** holes (3.2 mm finished) with ≥1.5 mm keep‑out annulus; nominal centers at (4,4), (71,4), (4,51), (71,51). Tented vias near holes.
+- Mounting: **4× M3** holes (3.2 mm finished) with ≥1.5 mm keep‑out annulus; nominal centers at (4,4), (76,4), (4,46), (76,46). Tented vias near holes.
 - Keep‑outs: ESP32 antenna per datasheet; LCD and UI connectors away from high di/dt phase regions; star ground at battery‑negative shunt.
 
 ## 7. Programming & Debug

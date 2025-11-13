@@ -14,15 +14,28 @@ Bucks,U4,LMR33630ADDAR,24→3.3V buck (single-stage; 5V rail eliminated)
 Bucks,L4,10-22µH ≥2.5A,3.3V buck inductor (10µH for prototype)
 Bucks,C4x,22µF 10V X7R ×4,3.3V buck output
 Bucks,C4IN,10µF 50V X7R + 220nF,3.3V buck input
+Bucks,C_BOOT,100nF 16V X7R,LMR33630 bootstrap (BOOT-SW)
+Bucks,C_VCC,1µF 16V X7R,LMR33630 internal LDO (VCC-GND)
+Bucks,RFBT,100kΩ 1%,LMR33630 feedback top (VOUT to FB)
+Bucks,RFBB,43.2kΩ 1%,LMR33630 feedback bottom (FB to GND) for 3.3V
 
 USB_Prog,U7,TPS22919,USB load switch
+USB_Prog,C_TPS22919_IN,1µF 10V X7R,TPS22919 input cap (VIN-GND)
+USB_Prog,C_TPS22919_OUT,1µF 10V X7R,TPS22919 output cap (VOUT-GND)
 USB_Prog,U8,TLV75533,USB-only 3.3V LDO
+USB_Prog,C_TLV75533_IN,1µF 10V X7R,TLV75533 input cap (VIN-GND) CRITICAL
+USB_Prog,C_TLV75533_OUT,10µF 10V X7R,TLV75533 output cap (VOUT-GND) CRITICAL for stability
 USB_Prog,R_CC1,5.1kΩ,USB-C UFP CC1 pulldown to GND
 USB_Prog,R_CC2,5.1kΩ,USB-C UFP CC2 pulldown to GND
 USB_Prog,ESD_CC,ESD 2-line (DNI),CC1/CC2 ESD near connector
 
 MCU,U1,ESP32-S3-WROOM-1-N16R8,MCU module (USB on GPIO19/20)
+MCU,C_VDD_CPU,100nF 16V X7R,ESP32 VDD3P3_CPU (pin 46) decoupling
+MCU,C_VDD_RTC,100nF 16V X7R,ESP32 VDD3P3_RTC (pin 20) decoupling
+MCU,C_VDD_SPI,1µF 16V X7R,ESP32 VDD_SPI decoupling
 MCU,ESDUSB,USB ESD array,Near USB-C
+MCU,R_USB_DP,22Ω 1% 0402,USB D+ series near MCU (GPIO19)
+MCU,R_USB_DM,22Ω 1% 0402,USB D- series near MCU (GPIO20)
 MCU,R_CSA_U,56–100Ω,Series at GPIO5 (CSA U)
 MCU,C_CSA_U,470pF,Shunt to GND at GPIO5
 MCU,R_CSA_V,56–100Ω,Series at GPIO6 (CSA V)
@@ -73,7 +86,7 @@ IO_UI,R_START_SER,100Ω,Series at START_DIG near J_UI
 IO_UI,R_STOP_SER,100Ω,Series at STOP_NC_DIG near J_UI
 IO_UI,R19,10kΩ,Pull-up
 IO_UI,R20,100kΩ,Aux pull-up
-IO_UI,R21,5kΩ,Start leg (NO)
+IO_UI,R21,5.1kΩ,Start leg (NO)
 IO_UI,R11,10kΩ,Stop leg (NC)
 IO_UI,C19,100nF,RC at ladder node
 IO_UI,R_BTN_SER,100–220Ω,Series at BTN_SENSE to MCU

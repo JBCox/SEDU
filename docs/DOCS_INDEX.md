@@ -34,7 +34,7 @@
 - `hardware/Actuator.kicad_sch` — DRV8873-Q1 with R_ILIM/R_IPROPI.
 - `hardware/LCD_Connector.kicad_sch` — GC9A01 SPI connector and backlight.
 - `hardware/IO_UI.kicad_sch` — button ladder, Start/Stop, buzzer/LEDs.
-- `hardware/SEDU_PCB.kicad_pcb` — PCB outline and 4× M3 holes placed (80×60 mm).
+- `hardware/SEDU_PCB.kicad_pcb` — PCB outline and 4× M3 holes placed (80×50 mm).
 - `hardware/sym-lib-table` — project symbol library table (adds SEDU placeholders).
 - `hardware/README.md` — scaffold plan, nets, connectors, ERC/DRC expectations, resume steps.
 - `hardware/SEDU_PCB_Sheet_Index.md` — per-sheet notes and locked values.
@@ -51,6 +51,7 @@
 - `hardware/lib/SEDU_Placeholders.kicad_sym` — tiny local symbol lib (LM5069‑1, DRV8873‑Q1, DRV8353RS).
 - `hardware/lib/SEDU.pretty/R_2728_4T_Kelvin.kicad_mod` — custom 4-terminal Kelvin sense resistor footprint (2728 package).
 - `hardware/Library_Setup.md` — how to add the local symbol lib in KiCad.
+- `hardware/ASSEMBLY_NOTES.md` — critical assembly requirements (wire gauges, thermal vias, safety warnings) [LOCKED].
 
 ## Firmware & scripts
 - `firmware/include/pins.h` — locked pins; used by the checker.
@@ -69,16 +70,33 @@
 - `firmware/src/spi_drv8353.cpp` — Minimal DRV8353RS SPI init and raw status/ID reads.
 - `scripts/check_pinmap.py` — ensures pins.h matches the SSOT table.
 - `scripts/check_docs_index.py` — verifies this index and reports unindexed artifacts.
-- `scripts/check_kicad_outline.py` — verifies PCB outline 75×55 mm and presence/locations of 4× M3 holes at (4,4), (71,4), (4,51), (71,51).
+- `scripts/check_kicad_outline.py` — verifies PCB outline 80×50 mm and presence/locations of 4× M3 holes at (4,4), (76,4), (4,46), (76,46).
 - `scripts/check_netlabels_vs_pins.py` — confirms required net labels exist for firmware/connector coverage.
 - `scripts/check_value_locks.py` — cross-checks LM5069-1, DRV8873 R_ILIM/R_IPROPI locks, and board size across docs.
 - `scripts/check_policy_strings.py` — blocks banned strings outside allowlisted files.
+- `scripts/check_frozen_state_violations.py` — scans ALL documentation for obsolete values that contradict FROZEN_STATE_REV_C4b.md.
 - `scripts/check_kicad_versions.py` — prints KiCad file format versions for SCH/PCB (upgrade guidance).
 - `scripts/check_ladder_bands.py` — verifies ladder bands in SSOT match firmware constants and ordering.
 - `scripts/verify_power_calcs.py` — verifies ILIM/Rsense math and worst‑case inrush assumptions.
 - `scripts/check_5v_elimination.py` — verifies 5V rail removal and single-stage 24V→3.3V conversion.
 - `scripts/check_power_budget.py` — validates component power ratings vs applied stress (voltage/current/power).
 - `scripts/thermal_analysis.py` — thermal calculations for power components (junction temp, heatsinking).
+
+## Verification Reports
+- `reports/Agent1_Power_Thermal_Analysis_Report.md` — comprehensive power budget verification (2025-11-12).
+- `reports/Agent1_Executive_Summary.md` — power verification executive summary (2025-11-12).
+- `reports/Agent1_Thermal_Summary.txt` — thermal analysis summary (2025-11-12).
+- `reports/Component_Values_Verification_Report.md` — component values cross-check (2025-11-12).
+- Root-level reports (to be archived):
+  - `COMPREHENSIVE_VERIFICATION_REPORT_2025-11-12.md`
+  - `FINAL_STATUS_REPORT_2025-11-12.md`
+  - `THERMAL_VIA_VERIFICATION_REPORT_2025-11-12.md`
+  - `VERIFICATION_AGENT_V5_FINAL_REPORT.md`
+  - `VERIFICATION_COVERAGE_ANALYSIS_2025-11-12.md`
+  - `IMPLEMENTATION_SUMMARY.md`
+  - `BRINGUP_CHECKLIST_ENHANCEMENT.md`
+  - `5V_RAIL_ELIMINATION_SUMMARY.md`
+  - `GITHUB_ISSUES.md`
 
 ## Datasheets
 - `docs/datasheets/README.md` — notes on datasheet storage and linkage policy.
@@ -87,7 +105,7 @@
 - `docs/datasheets/LM5069_datasheet.pdf`
 - `docs/datasheets/LMR33630AF_datasheet.pdf`
 - `docs/datasheets/TPS22919_datasheet.pdf`
-- `docs/datasheets/TPS62133_datasheet.pdf`
+- ~~`docs/datasheets/TPS62133_datasheet.pdf`~~ (OBSOLETE - 5V rail eliminated)
 - `docs/datasheets/Electrocraft - RPX32-DataSheet-US.pdf`
 
 ## Archive

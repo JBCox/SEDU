@@ -2,8 +2,8 @@
 """Verify the KiCad PCB outline and mounting holes.
 
 Checks:
-- Edge.Cuts rectangle exists and is <= 75 x 55 mm (within small tolerance)
-- Four M3 mounting holes exist (3.2 mm drill), roughly at (4,4), (71,4), (4,51), (71,51)
+- Edge.Cuts rectangle exists and is <= 80 x 50 mm (within small tolerance)
+- Four M3 mounting holes exist (3.2 mm drill), roughly at (4,4), (76,4), (4,46), (76,46)
 
 Exit codes:
  0 = OK, 1 = violations found
@@ -40,8 +40,8 @@ def main() -> int:
         x0, y0, x1, y1 = map(float, rect.groups())
         w = abs(x1 - x0)
         h = abs(y1 - y0)
-        if w > 75.05 or h > 55.05:
-            print(f"[kicad_outline] Outline too large: {w:.2f} x {h:.2f} mm (max 75 x 55)")
+        if w > 80.05 or h > 50.05:
+            print(f"[kicad_outline] Outline too large: {w:.2f} x {h:.2f} mm (max 80 x 50)")
             rc = 1
         else:
             print(f"[kicad_outline] Outline OK: {w:.2f} x {h:.2f} mm")
@@ -49,7 +49,7 @@ def main() -> int:
         print(f"[kicad_outline] Expected 4 mounting holes, found {len(holes)}")
         rc = 1
     else:
-        expected = [(4, 4), (71, 4), (4, 51), (71, 51)]
+        expected = [(4, 4), (76, 4), (4, 46), (76, 46)]
         def dist(a,b):
             return math.hypot(a[0]-b[0], a[1]-b[1])
         matched = 0

@@ -4,8 +4,10 @@
 Checks (hard-coded for Rev C.4x):
 - LM5069 variant is '-1' in: SSOT, INIT, Component_Report, README_FOR_CODEX
 - DRV8873 locks: R_ILIM = 1.58 kΩ, R_IPROPI = 1.00 kΩ present in: SSOT, INIT, Component_Report, README_FOR_CODEX
+- RS_IN: WSLP2728 (3.0mΩ) - verified substitute for CSS2H-2728R-L003F
+- RS_U/V/W: CSS2H-2512K-2L00F (2.0mΩ, 5W) - K-suffix variant with verified power rating
 - Battery divider: RUV_TOP = 140kΩ, RUV_BOT = 10.0kΩ in BOM matches SSOT and firmware calibration
-- Board size '75 × 55 mm' present in: SSOT or Mounting, and INIT
+- Board size '80 × 50 mm' present in: SSOT or Mounting, and INIT
 
 Exit codes: 0 = OK, 1 = mismatches found
 """
@@ -44,14 +46,17 @@ def main() -> int:
     pats_lm5069 = [r"LM5069-1", r"latch\s*[-\u2010-\u2015]?\s*off"]
     # DRV8873 locks (allow 1.0 or 1.00 formatting)
     pats_drv = [r"R[_ ]?ILIM\s*=\s*1\.58\s*k", r"R[_ ]?IPROPI\s*=\s*1\.0+\s*k"]
-    # Board size (optimized from 80×60mm)
-    pats_size = [r"75\s*[×x]\s*55\s*mm"]
+    # Board size (optimized from 80×60mm baseline via 75×55mm intermediate)
+    pats_size = [r"80\s*[×x]\s*50\s*mm"]
 
     for label, path in FILES.items():
         missing = present(path, pats_lm5069 + pats_drv)
         if missing:
             print(f"[locks] {label}: missing {', '.join(missing)} in {path}")
             rc = 1
+
+    # BOM path for subsequent checks
+    bom_path = ROOT / "hardware" / "BOM_Seed.csv"
 
     # Rsense lock (3.0 mΩ) must appear in SSOT and Schematic_Place_List.csv
     ssot_ok = contains(FILES["SSOT"], r"3\.0\s*m[ΩOhm]") and contains(FILES["SSOT"], r"ILIM\s*≈?\s*18")
@@ -63,8 +68,29 @@ def main() -> int:
         print("[locks] RS_IN not set to 3.0 mΩ in hardware/Schematic_Place_List.csv")
         rc = 1
 
+    # RS_IN specific MPN lock (WSLP2728 - verified substitute for CSS2H-2728R-L003F)
+    rs_in_mpn_ok = contains(bom_path, r"RS_IN,\s*WSLP2728")
+    if not rs_in_mpn_ok:
+        print("[locks] RS_IN MPN not set to WSLP2728 in BOM_Seed.csv")
+        print("        (WSLP2728 is verified substitute for CSS2H-2728R-L003F)")
+        rc = 1
+
+    # Phase shunt locks (RS_U/V/W: CSS2H-2512K-2L00F, 2.0mΩ, 5W verified)
+    rs_u_mpn_ok = contains(bom_path, r"RS_U,\s*CSS2H-2512K-2L00F")
+    rs_u_value_ok = contains(bom_path, r"RS_U,.*2\s*m[ΩOhm]")
+    rs_u_rating_ok = contains(bom_path, r"RS_U,.*5W")
+    if not rs_u_mpn_ok:
+        print("[locks] RS_U MPN not set to CSS2H-2512K-2L00F in BOM_Seed.csv")
+        print("        (CSS2H-2512K-2L00F is K-suffix variant with 5W verified rating)")
+        rc = 1
+    if not rs_u_value_ok:
+        print("[locks] RS_U value not set to 2mΩ in BOM_Seed.csv")
+        rc = 1
+    if not rs_u_rating_ok:
+        print("[locks] RS_U power rating (5W) not documented in BOM_Seed.csv notes")
+        rc = 1
+
     # Battery divider lock (140kΩ / 10.0kΩ) must match across BOM, SSOT, and firmware
-    bom_path = ROOT / "hardware" / "BOM_Seed.csv"
     bom_ruv_top_ok = contains(bom_path, r"RUV_TOP,\s*ERA-3AEB1403V") and contains(bom_path, r"140\s*k[ΩOhm]")
     bom_ruv_bot_ok = contains(bom_path, r"RUV_BOT,\s*ERA-3AEB1002V") and contains(bom_path, r"10\.0\s*k[ΩOhm]")
     ssot_divider_ok = contains(FILES["SSOT"], r"140\s*k[ΩOhm]\s*/\s*10\.0\s*k[ΩOhm]")
@@ -97,10 +123,10 @@ def main() -> int:
         mount = ROOT / "hardware" / "Mounting_And_Envelope.md"
         ssot_ok = not present(mount, pats_size)
     if not ssot_ok:
-        print("[locks] Board size 75×55 mm missing in SSOT/Mounting")
+        print("[locks] Board size 80×50 mm missing in SSOT/Mounting")
         rc = 1
     if not init_ok:
-        print("[locks] Board size 75×55 mm missing in INIT.md")
+        print("[locks] Board size 80×50 mm missing in INIT.md")
         rc = 1
 
     if rc == 0:

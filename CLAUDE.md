@@ -4,6 +4,44 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## ⚠️ FROZEN STATE - READ FIRST
+
+**CRITICAL**: This design is in FROZEN STATE for Rev C.4b PCB fabrication.
+
+**Before making ANY changes**, read: `FROZEN_STATE_REV_C4b.md`
+
+**All changes MUST**:
+1. Pass 100% of verification scripts (9/9 PASS required)
+2. Run `python scripts/check_frozen_state_violations.py` (MUST return 0 violations)
+3. Be documented in FROZEN_STATE_REV_C4b.md
+4. Update affected verification script locks
+5. Get multi-AI approval if safety-critical
+
+**Pre-Commit Hook ACTIVE**: Git pre-commit hook automatically runs ALL 9 verification scripts.
+If ANY script fails, commit is BLOCKED. This prevents frozen state violations from ever being committed.
+
+**Locked Values** (DO NOT CHANGE without updating frozen state):
+- Battery divider: 140kΩ / 10kΩ
+- LM5069 RS_IN: 3.0mΩ (WSLP2728)
+- Phase shunts: 2.0mΩ, 5W (CSS2H-2512K-2L00F)
+- DRV8873: R_ILIM=1.58kΩ, R_IPROPI=1.00kΩ
+- Board: 80mm × 50mm
+- All GPIO assignments in pins.h
+
+**Verification Command** (must return 100% PASS):
+```bash
+python scripts/check_value_locks.py && \
+python scripts/check_pinmap.py && \
+python scripts/check_power_budget.py && \
+python scripts/verify_power_calcs.py && \
+python scripts/check_netlabels_vs_pins.py && \
+python scripts/check_kicad_outline.py && \
+python scripts/check_5v_elimination.py && \
+python scripts/check_ladder_bands.py
+```
+
+---
+
 ## Project Overview
 
 **SEDU Single-PCB Feed Drill** - 24V battery-powered handheld aviation tool with BLDC motor and linear actuator. Replaces legacy VESC-based multi-board stack with integrated ESP32-S3 controller combining motor driver (DRV8353RS), actuator driver (DRV8873-Q1), hot-swap protection (LM5069-1), and safety interlocks.
@@ -35,15 +73,23 @@ python scripts/check_power_budget.py  # Exit code 1 expected for known issues
 # 4. Net label consistency (schematic ↔ firmware)
 python scripts/check_netlabels_vs_pins.py
 
-# 5. Board geometry (75×55mm, 4× M3 holes)
+# 5. Board geometry (80×50mm, 4× M3 holes)
 python scripts/check_kicad_outline.py
 
 # 6. Power calculations verification
 python scripts/verify_power_calcs.py
 
-# Optional but recommended:
-python scripts/check_ladder_bands.py    # Button voltage thresholds
-python scripts/check_policy_strings.py  # No banned legacy strings
+# 7. 5V rail elimination verification
+python scripts/check_5v_elimination.py
+
+# 8. Button ladder verification
+python scripts/check_ladder_bands.py
+
+# 9. Frozen state violations (CRITICAL - prevents old values from creeping back)
+python scripts/check_frozen_state_violations.py
+
+# Optional:
+python scripts/check_policy_strings.py  # Legacy banned strings
 python scripts/check_docs_index.py      # Documentation tracking
 ```
 
@@ -101,7 +147,7 @@ USB-C → TPS22919 load switch → TLV75533 LDO (3.3V) → ESP32-S3 only
 ### Motor Control Stack
 - **DRV8353RS**: 3-phase gate driver with integrated CSAs (20V/V gain)
 - **MOSFETs**: 6× 60V SuperSO8 (BSC016N06NS), 2mΩ typical
-- **Shunts**: 3× 2mΩ 2512 Kelvin sense (CSS2H-2512R-L200F)
+- **Shunts**: 3× 2mΩ 2512 Kelvin sense (CSS2H-2512K-2L00F, 5W verified)
 - **Hall Sensors**: GPIO8/9/13 (3 halls → 6-step commutation, expandable to FOC)
 - **PWM**: MCPWM peripheral on GPIO38-43 (HS U/V/W, LS U/V/W)
 
@@ -227,7 +273,7 @@ This project uses coordinated development between Claude Code, Codex CLI, and Ge
 - LM5069 RS_IN: 3.0mΩ (ILIM = 55mV / 3.0mΩ = 18.3A)
 - DRV8873 R_ILIM: 1.58kΩ (3.3A limit)
 - DRV8873 R_IPROPI: 1.00kΩ
-- Board outline: 75×55mm
+- Board outline: 80×50mm
 - M3 holes: 4× at specified positions
 
 Changes to these require:
@@ -321,7 +367,7 @@ rg -n "GC9A01|MISO NC|CS_LCD|GPIO16" -S docs/
 **BOM Warnings** (hardware/BOM_Seed.csv):
 - J_MOT: MicroFit 3P rated 8A, peak 20A → use 3×2P or higher-rated connector
 - J_BAT: Requires 14 AWG wire minimum for 23A peak
-- RS_U/V/W: Verify CSS2H-2512R-L200F is ≥3W rated (typical 2512 is 1-2W)
+- RS_U/V/W: ✅ CSS2H-2512K-2L00F verified 5W rated (525% margin @ 20A peaks, confirmed 2025-11-12)
 
 **Missing Features** (not critical for first prototype):
 - NTC temperature monitoring (GPIO10 defined but not read)

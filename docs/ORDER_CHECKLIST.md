@@ -6,7 +6,7 @@
 - Symbols for LM5069‑1, DRV8873‑Q1, DRV8353RS placed (SEDU lib or vendor symbols).
 
 2) KiCad PCB
-- Outline 80×60 mm, 4× M3 holes present (run `python3 scripts/check_kicad_outline.py`).
+- Outline 80×50 mm, 4× M3 holes present (run `python3 scripts/check_kicad_outline.py`).
 - Mounting keep‑outs around holes; antenna keep‑out per Espressif.
 - High‑di/dt loops and decoupling compact; phase shunts Kelvin.
 

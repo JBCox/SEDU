@@ -14,7 +14,7 @@
   - ESP32-S3-WROOM-1-N16R8; pins per SSOT; keep GPIO-JTAG disabled; add test pads for 3V3/24V/RX/TX/BTN_SENSE/IPROPI.
   - ADC anti-alias: series + shunt RCs at GPIO1/2/5/6/7 per README (CSA, BAT, IPROPI).
 - Motor_Driver
-  - DRV8353RS + 6× 60 V MOSFETs; 3× 2 mΩ 2512 Kelvin shunts; decoupling: CPL-CPH 47 nF; VCP, VGLS, DVDD 1 µF.
+  - DRV8353RS + 6× 60 V MOSFETs; 3× 2 mΩ 2512 Kelvin shunts (CSS2H-2512K-2L00F, 5W, K suffix NOT R); decoupling: CPL-CPH 47 nF; VCP, VGLS, DVDD 1 µF.
   - Optional RC snubbers (DNI): per phase to PGND; R=10 Ω (0603) in series with C=1–4.7 nF (0603), placed close to bridge.
   - See hardware/README.md “Gate Drive Guidance” for gate R values/placement and ±2 mm matching.
 - Actuator
@@ -23,7 +23,7 @@
   - GC9A01 SPI; SCK=GPIO18; MOSI=GPIO17; CS_LCD=GPIO16; MISO NC; DC/RST pins; LEDK sink 10–20 mA via FET or resistor.
   - Optional LEDK ferrite bead (DNI) near J_LCD for EMI if needed during bring‑up.
 - IO_UI
-  - Button ladder: R19=10 k, R20=100 k, R21=5 k (Start NO), R11=10 k (Stop NC), C19=100 nF; BTN_SENSE RC at MCU (1–4.7 k + 0.1 µF).
+  - Button ladder: R19=10 k, R20=100 k, R21=5.1 k (Start NO), R11=10 k (Stop NC), C19=100 nF; BTN_SENSE RC at MCU (1–4.7 k + 0.1 µF).
   - START_DIG=GPIO23; STOP_NC_DIG=GPIO24; buzzer/LEDs per SSOT.
   - ESD: 4‑line TVS array (ESD_UI) placed next to J_UI with short ground return.
   - Series resistors: 100 Ω at START_DIG and STOP_NC_DIG near J_UI (limit ESD surge/edge rates).

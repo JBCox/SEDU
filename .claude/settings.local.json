@@ -8,7 +8,19 @@
       "WebFetch(domain:www.ti.com)",
       "WebFetch(domain:www.digikey.com)",
       "WebFetch(domain:www.mouser.com)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(python scripts/check_value_locks.py:*)",
+      "Bash(python scripts/check_pinmap.py:*)",
+      "Bash(dir:*)",
+      "Bash(chmod:*)",
+      "Bash(find:*)",
+      "Bash(if [ -f .git/hooks/pre-commit ])",
+      "Bash(then echo \"Pre-commit hook EXISTS\")",
+      "Bash(else echo \"Pre-commit hook MISSING\")",
+      "Bash(fi)",
+      "Bash(findstr:*)",
+      "Bash(echo:*)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []

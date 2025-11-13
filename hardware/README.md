@@ -5,11 +5,11 @@ This folder documents the exact KiCad structure to build. First spin omits 12 V 
 ## Project Layout (to create in KiCad)
 - `SEDU_PCB.kicad_pro` — top‑level project
 - `SEDU_PCB.kicad_sch` — top sheet with hierarchical blocks below
-- `SEDU_PCB.kicad_pcb` — board file (75×55 mm target outline + 4× M3 holes)
+- `SEDU_PCB.kicad_pcb` — board file (80×50 mm target outline + 4× M3 holes)
 
 ## Hierarchical Sheets
 - Power_In (LM5069‑1 + TVS + reverse FET)
-- Bucks (LMR33630AF 24→5 V; TPS62133 5→3.3 V)
+- Bucks (LMR33630ADDAR 24→3.3 V single-stage; 5V rail eliminated)
 - USB_Prog (TPS22919 → TLV75533)
 - MCU (ESP32‑S3‑WROOM‑1)
 - Motor_Driver (DRV8353RS + 6× 60 V MOSFETs + 3× 2 mΩ shunts)
@@ -29,10 +29,10 @@ See `hardware/SEDU_PCB_Sheet_Index.md` for per‑sheet details and refs.
   - Cable ≤200 mm; BTN_SENSE twisted with GND; 100–220 Ω series at J_UI; 100 nF at MCU ADC pin.
 
 ## Board Outline & Holes
-- Board outline: **75×55 mm** (optimized from 80×60mm baseline; 14% area reduction)
+- Board outline: **80×50 mm** (optimized from 80×60mm baseline; 17% area reduction, fits credit card footprint 85.6×54mm)
 - Optimization leverages 5V rail elimination (~12-15mm space savings in power section)
 - Thermal analysis confirms adequate copper area (470mm²/W) for 8.5W dissipation
-- Four M3 holes (3.2 mm finished) at positions: (4,4), (71,4), (4,51), (71,51) mm from corner
+- Four M3 holes (3.2 mm finished) at positions: (4,4), (76,4), (4,46), (76,46) mm from corner
 - Keep‑out annulus ≥1.5 mm around holes. Tented vias near holes.
 - **Note**: Mounting holes NOT constrained by enclosure - tool designed around board
 
@@ -94,7 +94,7 @@ Planes, pours, and keep‑outs:
 - Route gate return currents tightly with their source references; avoid crossing sensitive analog.
 - Place DRV8353RS close to the bridge; place VGLS/VCP/DVDD decoupling at pins with direct vias.
 
-## Placement Zones (75×55 mm optimized outline)
+## Placement Zones (80×50 mm optimized outline)
 - Power Entry + Star: Place LM5069, TVS, reverse FET, and battery connector along one short edge. The PGND↔LGND NetTie_2 star sits immediately downstream of the sense resistor. Keep VBAT/VBAT_PROT pours wide with via stitching.
 - Buck (24→3.3V): Next to power entry, with SW island oriented inward (away from MCU/ADC). Provide local copper for thermal spread. **8× thermal vias (Ø0.3mm) under LMR33630 PowerPAD mandatory.**
 - Bridge + Shunts: Place DRV8353RS + MOSFETs + shunts together on the side opposite the MCU/antenna. Keep gate resistors at gates; true Kelvin from shunts; phase pours to motor connector.

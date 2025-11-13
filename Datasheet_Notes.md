@@ -58,7 +58,7 @@
 - **Sequence**: When 24 V is absent and USB is connected, TPS22919 enables TLV75533 to power the ESP32 (radios kept off to stay <250 mA). When 24 V is present, the USB path is disabled, preventing dual-feed.
 
 ## Battery Divider (ESP32‑S3 ADC1)
-- **Locked values:** 49.9 kΩ (high) / 6.80 kΩ (low), 0.1%. 6S max 25.2 V → ~3.02 V at ADC with 12 dB attenuation.
+- **Locked values:** 140 kΩ (high, ERA-3AEB1403V) / 10.0 kΩ (low, ERA-3AEB1002V), 1%. 6S max 25.2 V → 1.68 V at ADC with 12 dB attenuation.
 - **RC at pin:** 1–4.7 kΩ series + 0.1 µF to GND placed at the MCU pin.
 - **Firmware:** Store 2‑point calibration in NVS and use multisampling to reduce noise.
 

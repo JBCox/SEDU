@@ -6,7 +6,7 @@
 - Shunts: 2512 four-terminal preferred for phase; verify library symbol supports Kelvin pads.
 - LM5069-1: MSOP-10 or WSON per datasheet; pick package CM stocks.
 - LMR33630AF: RNX/QFN package saves space; verify CM capability; else SOIC variant.
-- TPS62133: QFN/DFN; check assembly guidelines.
+- ~~TPS62133~~: OBSOLETE (5V rail eliminated - use LMR33630ADDAR for 24V→3.3V direct)
 - DRV8873-Q1: HTSSOP.
 - Connectors: JST-GH 1.25 mm 8-pin for J_LCD and J_UI; MicroFit 3.0 for power/device connectors.
 - Mounting holes: KiCad "MountingHole_3.2mm_M3" footprints already placed on PCB outline.

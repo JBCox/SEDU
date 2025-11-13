@@ -5,7 +5,7 @@
 - DRV8873 locks: R_ILIM = 1.58 kΩ (≈3.3 A), R_IPROPI = 1.00 kΩ; IPROPI → ADC1_CH1 (GPIO2) and test pad.
 - USB programming‑only: TPS22919 → TLV75533; radios OFF; USB never powers tool.
 - DRV8353 decoupling: CPL‑CPH 47 nF; VCP, VGLS, DVDD 1 µF.
-- Battery divider: 49.9 k / 6.80 k (0.1%); RC at pin 1–4.7 k + 0.1 µF.
+- Battery divider: 140 kΩ / 10.0 kΩ (1%); RC at pin 1–4.7 k + 0.1 µF. [LOCKED: RUV_TOP=ERA-3AEB1403V, RUV_BOT=ERA-3AEB1002V]
 - GPIO map: per SSOT and firmware/include/pins.h (checker PASS).
 
 ## What’s New in Hardware/
@@ -26,7 +26,7 @@
 
 ## Next Actions (Me)
 - Create KiCad project files and draw the hierarchical sheets.
-- Place board outline (75×55mm), 4× M3 holes at (4,4), (71,4), (4,51), (71,51), and connectors (edge‑aligned).
+- Place board outline (80×50mm), 4× M3 holes at (4,4), (76,4), (4,46), (76,46), and connectors (edge‑aligned).
 - Run ERC and record notes under this file; adjust symbols/flags until clean.
 
 ## Next Actions (You)

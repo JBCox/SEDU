@@ -12,17 +12,20 @@
 
 **Rule**: After fixing ANY bug, updating ANY component value, or changing ANY design parameter, you MUST run ALL verification scripts to ensure documentation consistency across the project.
 
-**Why**: Past issues (e.g., battery divider mismatch: firmware had 140kΩ/10kΩ, but spec said 49.9kΩ/6.8kΩ) were caused by updating one file but missing others. This rule prevents documentation drift.
+**Why**: Past issues (e.g., battery divider mismatch where firmware and spec had different values) were caused by updating one file but missing others. This rule prevents documentation drift. All values now locked in FROZEN_STATE_REV_C4b.md.
 
 **Required Commands** (ALL must PASS before considering fix complete):
 ```bash
 # Core verification suite (run in order)
-python scripts/check_value_locks.py      # Critical component values consistent
-python scripts/check_pinmap.py           # Firmware ↔ documentation GPIO map
-python scripts/check_power_budget.py     # Component ratings vs applied stress
-python scripts/check_netlabels_vs_pins.py # Schematic net label consistency
-python scripts/check_kicad_outline.py    # PCB geometry (80×60mm, M3 holes)
-python scripts/verify_power_calcs.py     # Power calculations verification
+python scripts/check_value_locks.py           # Critical component values consistent
+python scripts/check_pinmap.py                # Firmware ↔ documentation GPIO map
+python scripts/check_power_budget.py          # Component ratings vs applied stress
+python scripts/check_netlabels_vs_pins.py     # Schematic net label consistency
+python scripts/check_kicad_outline.py         # PCB geometry (80×50mm, M3 holes)
+python scripts/verify_power_calcs.py          # Power calculations verification
+python scripts/check_5v_elimination.py        # 5V rail elimination verified
+python scripts/check_ladder_bands.py          # Button ladder thresholds
+python scripts/check_frozen_state_violations.py # No obsolete values (CRITICAL)
 ```
 
 **When Each Script Fails**:
@@ -47,7 +50,7 @@ python scripts/verify_power_calcs.py     # Power calculations verification
 
 - Battery-only operation. USB-C is programming-only and never powers the tool.  
 - USB programming rail: `TPS22919 -> TLV75533 (3.3 V)`; radios OFF when on USB.  
-- Motor stage: `DRV8353RS` + external 60 V MOSFETs; 3 × 2 mΩ shunts; CSA gain 20 V/V.  
+- Motor stage: `DRV8353RS` + external 60 V MOSFETs; 3 × 2 mΩ shunts (CSS2H-2512K-2L00F, 5W verified, K suffix NOT R); CSA gain 20 V/V.  
 - Actuator: `DRV8873-Q1 (PH/EN)`; 24 V default supply (VM tied to protected 24 V). Locks for first spin: `R_ILIM = 1.58 kΩ (≈3.3 A)`, `R_IPROPI = 1.00 kΩ`; IPROPI routed to `GPIO2` and a test pad.  
 - Display: `GC9A01` 240×240 SPI (write-only, MISO NC); `CS_LCD=GPIO16`; backlight 10–20 mA.  
 - MCU: `ESP32-S3-WROOM-1-N16R8`; keep GPIO-JTAG disabled so MCPWM owns `GPIO38–43`.  
@@ -55,7 +58,7 @@ python scripts/verify_power_calcs.py     # Power calculations verification
 - SPI: DRV CS `GPIO22`; LCD CS `GPIO16`; `SCK=GPIO18`, `MOSI=GPIO17`, `MISO=GPIO21` (write-only LCD).  
 
 Mechanical/PCB locks (first spin):
-- Board outline target: **75 × 55 mm** (optimized from 80×60mm; 14% area reduction); 4 × M3 holes (3.2 mm finished) at (4,4), (71,4), (4,51), (71,51).
+- Board outline target: **80 × 50 mm** (optimized from 80×60mm via 75×55mm; 17% area reduction, fits credit card 85.6×54mm); 4 × M3 holes (3.2 mm finished) at (4,4), (76,4), (4,46), (76,46).
 - 4-layer stack recommended; antenna keep-out per Espressif.
 - 12 V actuator buck footprints: **omitted** to minimize area (24 V actuator default).
 - 5V rail: **eliminated** - single-stage 24V→3.3V conversion (LMR33630ADDAR only; TPS62133 removed).  
@@ -71,7 +74,7 @@ Bring-up confirmations (locked values; verify on bench):
    - `python3 scripts/check_pinmap.py` (doc ↔ firmware pins)
    - `python3 scripts/check_power_budget.py` (component ratings vs stress; exit code 1 expected for known issues)
    - `python3 scripts/check_netlabels_vs_pins.py` (required net labels exist)
-   - `python3 scripts/check_kicad_outline.py` (board size ≤80×60 mm and 4× M3 holes present)
+   - `python3 scripts/check_kicad_outline.py` (board size 80×50 mm and 4× M3 holes present)
    - `python3 scripts/verify_power_calcs.py` (power calculations verification)
    - `python3 scripts/check_policy_strings.py` (no banned legacy strings reintroduced)
    - `python3 scripts/check_kicad_versions.py` (report file format versions; ok to upgrade on save)

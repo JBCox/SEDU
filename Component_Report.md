@@ -44,6 +44,7 @@ This report details the key specifications and project-specific roles of the pri
 ### Project-Specific Info:
 - **6-Step & FOC:** The driver is configured to support both Hall-sensor-based 6-step commutation (our initial implementation) and FOC (our future goal).
 - **CSA Outputs:** The three CSA outputs are directly wired to the ESP32-S3's ADC channels (`GPIO5/6/7`), which is the cornerstone of our FOC-ready design. The gain of these amplifiers must be set via SPI to match the sense resistor value and the ADC's input voltage range.
+- **Phase Shunts:** 3× CSS2H-2512K-2L00F (2.0mΩ, 2512, 5W verified, K suffix NOT R) Kelvin sense resistors measure motor phase currents for FOC control.
 - **Decoupling (lock):** CPL‑CPH = 47 nF (≥100 V X7R); VCP‑VDRAIN = 1 µF (≥16 V); VGLS‑GND = 1 µF (≥16–25 V); DVDD = 1 µF (≥6.3 V). Place tight to the DRV8353RS pins.
 - **SPI Control (GPIO22):** The SPI interface is used to set gate drive current, configure protection features, and read fault status, giving the firmware fine-grained control and diagnostic capabilities.
 
@@ -81,7 +82,7 @@ This report details the key specifications and project-specific roles of the pri
 ### 4.2 5V to 3.3V Buck Converter (REMOVED)
 - **Component:** `TPS62133` - **ELIMINATED in Rev C.4a+**
 - **Status:** This component and the entire 5V intermediate rail have been removed from the design. The LMR33630ADDAR now provides 3.3V directly from the 24V battery rail in a single-stage conversion.
-- **Rationale:** Eliminating the two-stage power conversion (24V→5V→3.3V) reduces BOM count, board area by ~75×55mm optimization, and cumulative conversion losses. The direct 24V→3.3V approach is more efficient and simplifies the power architecture.
+- **Rationale:** Eliminating the two-stage power conversion (24V→5V→3.3V) reduces BOM count, board area (enabling 80×50mm optimization from 80×60mm baseline), and cumulative conversion losses. The direct 24V→3.3V approach is more efficient and simplifies the power architecture.
 
 ### 4.3 USB Power Path
 - **Components:** `TPS22919` (load switch) & `TLV75533` (3.3 V LDO)
