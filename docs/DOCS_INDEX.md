@@ -20,6 +20,8 @@
 - `docs/ORDER_CHECKLIST.md` — go/no‑go steps for fabrication and assembly handoff.
 - `docs/DATASHEET_LINKS.md` — authoritative product/datasheet links (preferred to adding new PDFs).
 - `docs/TOOL_VERSIONS.md` — record KiCad/Python versions used for reproducibility.
+- `docs/DESIGN_REVIEW_WORKFLOW.md` — step-by-step design review process to prevent power issues.
+- `docs/POWER_BUDGET_MASTER.md` — comprehensive power calculations and component stress analysis (SSOT for power).
 
 ## Hardware (KiCad)
 - `hardware/SEDU_PCB.kicad_pro` — KiCad project file.
@@ -45,7 +47,9 @@
 - `hardware/ERC_Notes.md` — how to mark No-ERC and add PWR_FLAGs.
 - `hardware/Symbol_Footprint_Notes.md` — notes on package choices and assembly practicality.
 - `hardware/Footprint_Assignments.csv` — ready-to-paste footprint mappings for common refs.
+- `hardware/fp-lib-table` — KiCad footprint library table (links custom footprint libraries).
 - `hardware/lib/SEDU_Placeholders.kicad_sym` — tiny local symbol lib (LM5069‑1, DRV8873‑Q1, DRV8353RS).
+- `hardware/lib/SEDU.pretty/R_2728_4T_Kelvin.kicad_mod` — custom 4-terminal Kelvin sense resistor footprint (2728 package).
 - `hardware/Library_Setup.md` — how to add the local symbol lib in KiCad.
 
 ## Firmware & scripts
@@ -72,6 +76,9 @@
 - `scripts/check_kicad_versions.py` — prints KiCad file format versions for SCH/PCB (upgrade guidance).
 - `scripts/check_ladder_bands.py` — verifies ladder bands in SSOT match firmware constants and ordering.
 - `scripts/verify_power_calcs.py` — verifies ILIM/Rsense math and worst‑case inrush assumptions.
+- `scripts/check_5v_elimination.py` — verifies 5V rail removal and single-stage 24V→3.3V conversion.
+- `scripts/check_power_budget.py` — validates component power ratings vs applied stress (voltage/current/power).
+- `scripts/thermal_analysis.py` — thermal calculations for power components (junction temp, heatsinking).
 
 ## Datasheets
 - `docs/datasheets/README.md` — notes on datasheet storage and linkage policy.

@@ -31,7 +31,7 @@ def extract_paths(md_text: str) -> Set[pathlib.Path]:
     # Match backticked code spans and filter for our dirs
     for m in re.findall(r"`([^`]+)`", md_text):
         p = pathlib.Path(m)
-        if any(str(p).startswith(d + "/") for d in SCAN_DIRS):
+        if any(p.as_posix().startswith(d + "/") for d in SCAN_DIRS):
             paths.add(p)
     return paths
 
