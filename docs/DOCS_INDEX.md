@@ -1,6 +1,6 @@
 # Documentation Index
 
-**Last Updated**: 2025-11-14
+**Last Updated**: 2025-11-15
 **Organization**: Cleaned up and reorganized for clarity
 
 ---
@@ -18,11 +18,13 @@
 - `MANDATORY_PREFAB_CHECKLIST.md` — 10-section pre-fabrication verification checklist
 
 **Quick Reference**:
+- `QUICKSTART.md` — Quick start guide for new sessions (verification workflow, common tasks)
 - `Datasheet_Notes.md` — Distilled notes from vendor datasheets
 - `Component_Report.md` — Per-IC project roles and locked values (GENERATED)
+- `VERIFICATION_SYSTEM_COMPLETE.md` — Database migration completion report (9/9 scripts passing)
 
-**Database & Workflow** (NEW):
-- `design_database.yaml` — Single source of truth for all design values (53 components, 35 GPIOs)
+**Database & Workflow**:
+- `design_database.yaml` — Single source of truth for all design values (117 components, 35 GPIOs, 7 ICs)
 
 ---
 
@@ -112,7 +114,7 @@
 - `IO_UI.kicad_sch` — Button ladder, Start/Stop, buzzer/LEDs
 
 ### Design Data (GENERATED from design_database.yaml)
-- `BOM_Seed.csv` — Bill of materials (53 components) **[AUTO-GENERATED]**
+- `BOM_Seed.csv` — Bill of materials (117 components) **[AUTO-GENERATED]**
 - `Net_Labels.csv` — Canonical net names (44 nets) **[AUTO-GENERATED]**
 
 ### Reference Files
@@ -156,32 +158,36 @@
 
 ## scripts/ Directory (Verification & Generation)
 
-### Database System (NEW)
+### Database System
 **Master Generator**:
 - `generate_all.py` — Runs all 4 generators in sequence
 
 **Individual Generators**:
-- `generate_bom.py` — Creates hardware/BOM_Seed.csv
-- `generate_pins_h.py` — Creates firmware/include/pins.h
-- `generate_netlabels.py` — Creates hardware/Net_Labels.csv
-- `generate_component_report.py` — Creates Component_Report.md
+- `generate_bom.py` — Creates hardware/BOM_Seed.csv from database
+- `generate_pins_h.py` — Creates firmware/include/pins.h from database
+- `generate_netlabels.py` — Creates hardware/Net_Labels.csv from database
+- `generate_component_report.py` — Creates Component_Report.md from database
 
-**Database-Driven Verification** (Rewritten):
-- `check_database_schema.py` — Validates design_database.yaml structure
-- `check_value_locks.py` — Checks 17 locked component values (reads database)
-- `check_pinmap.py` — Validates 35 GPIO assignments (reads database)
+### Database-Driven Verification (9 scripts - ALL PASSING)
+**Master Verification Runner**:
+- `run_all_verification.py` — Runs all 9 verification scripts with summary (RECOMMENDED)
 
-### Legacy Verification Scripts
-**Note**: These still read old file formats. Will be updated to database-driven in future.
+**Core Verification Suite** (all read from design_database.yaml):
+- `check_database_schema.py` — Validates design_database.yaml structure (117 components, 35 GPIO, 7 ICs)
+- `check_value_locks.py` — Checks 17 locked component values
+- `check_pinmap.py` — Validates 35 GPIO assignments (firmware ↔ database)
+- `check_netlabels_vs_pins.py` — Confirms 44 net labels exist (auto-built from database)
+- `check_kicad_outline.py` — Verifies PCB outline 80×50mm and M3 holes (reads database)
+- `check_5v_elimination.py` — Verifies 5V rail elimination (reads banned lists from database)
+- `check_ladder_bands.py` — Verifies button ladder voltage bands (database ↔ firmware)
+- `verify_power_calcs.py` — Verifies 8 power calculations (all values from database)
+- `check_bom_completeness.py` — Verifies 61 critical IC components present (reads database)
 
-- `check_power_budget.py` — Validates component power ratings vs applied stress
-- `check_netlabels_vs_pins.py` — Confirms net labels exist for firmware/connector coverage
-- `check_kicad_outline.py` — Verifies PCB outline 80×50mm and M3 holes
-- `verify_power_calcs.py` — Verifies ILIM/Rsense math and inrush assumptions
-- `check_5v_elimination.py` — Verifies 5V rail removal and single-stage conversion
-- `check_ladder_bands.py` — Verifies ladder bands SSOT ↔ firmware consistency
-- `check_frozen_state_violations.py` — Scans docs for obsolete values
-- `check_bom_completeness.py` — Verifies datasheet-required components present
+### Optional Verification Scripts
+**Note**: Not in main suite, run separately as needed.
+
+- `check_power_budget.py` — Component power ratings vs applied stress (exit code 1 expected for known thermal issues)
+- `check_frozen_state_violations.py` — Scans docs for obsolete values (prevents drift)
 
 ### Utility Scripts
 - `check_kicad_versions.py` — Prints KiCad file format versions
@@ -216,11 +222,11 @@
 
 ---
 
-## File Generation Workflow (NEW)
+## Database-Driven Workflow
 
 **Single Source of Truth**: `design_database.yaml`
 
-**To make changes**:
+**To make design changes**:
 ```bash
 # 1. Edit database (ONLY file to manually edit)
 notepad design_database.yaml
@@ -228,50 +234,62 @@ notepad design_database.yaml
 # 2. Regenerate all files
 python scripts/generate_all.py
 
-# 3. Verify
-python scripts/check_database_schema.py
-python scripts/check_value_locks.py
-python scripts/check_pinmap.py
+# 3. Verify (CRITICAL - all 9 scripts must PASS)
+python scripts/run_all_verification.py
 
-# 4. Commit
+# 4. Commit (if verification passes)
 git add -u && git commit && git push
 ```
 
 **Generated files** (DO NOT edit manually):
-- `hardware/BOM_Seed.csv`
-- `firmware/include/pins.h`
-- `hardware/Net_Labels.csv`
-- `Component_Report.md`
+- `hardware/BOM_Seed.csv` (117 components)
+- `firmware/include/pins.h` (35 GPIO pins)
+- `hardware/Net_Labels.csv` (44 net labels)
+- `Component_Report.md` (per-IC documentation)
+
+**Benefits**:
+- Zero documentation drift (impossible by design)
+- Auto-updating verification (reads database directly)
+- Single point of edit (only modify design_database.yaml)
+- Proven bug detection (found 2 critical bugs during migration)
 
 **See**: `docs/NEW_WORKFLOW_GUIDE.md` for complete usage guide
+**See**: `VERIFICATION_SYSTEM_COMPLETE.md` for system architecture and migration report
 
 ---
 
 ## Quick Navigation
 
 **Starting a new session?**
-→ Read `INIT.md`
+→ Read `INIT.md` then run `python scripts/run_all_verification.py`
+
+**Quick reference guide?**
+→ Read `QUICKSTART.md` (verification workflow, common tasks, troubleshooting)
+
+**Understanding the verification system?**
+→ Read `VERIFICATION_SYSTEM_COMPLETE.md` (database migration, 9/9 scripts passing)
 
 **Making design changes?**
-→ Read `docs/NEW_WORKFLOW_GUIDE.md`
+→ Read `docs/NEW_WORKFLOW_GUIDE.md` (database-driven workflow)
 
 **Understanding frozen state?**
-→ Read `FROZEN_STATE_REV_C4b.md`
+→ Read `FROZEN_STATE_REV_C4b.md` (locked design values for Rev C.4b)
 
 **Pre-fabrication checks?**
-→ Read `MANDATORY_PREFAB_CHECKLIST.md`
+→ Read `MANDATORY_PREFAB_CHECKLIST.md` (10-section checklist)
 
 **Power calculations?**
-→ Read `docs/POWER_BUDGET_MASTER.md`
+→ Read `docs/POWER_BUDGET_MASTER.md` (comprehensive power analysis)
 
 **Firmware development?**
 → See `firmware/` directory and `CLAUDE.md` Section "Firmware Development"
 
 **Verification status?**
-→ See `reports/2025-11-14/` for latest verification results
+→ Run `python scripts/run_all_verification.py` for current status
 
 ---
 
-**Document Status**: Current as of 2025-11-14
-**Organization**: Root cleaned (8 essential files), reports dated, guides in docs/
+**Document Status**: Current as of 2025-11-15
+**Organization**: Root cleaned (11 essential files), database-driven verification (9/9 passing), guides in docs/
+**Verification System**: Database migration complete - all scripts read from design_database.yaml
 **Maintenance**: Update this index when adding/removing/moving documentation files

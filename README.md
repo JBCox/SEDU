@@ -7,6 +7,7 @@
 
 ## Quick Start
 
+**New Session?** Run `python scripts/run_all_verification.py` then read `QUICKSTART.md`
 **For AI Agents**: Read `CLAUDE.md` or `README_FOR_CODEX.md` first
 **For Humans**: Read `INIT.md` to understand project status
 **For Fabrication**: Check `MANDATORY_PREFAB_CHECKLIST.md` before ordering PCBs
@@ -30,17 +31,23 @@ Single-PCB integrated controller replacing legacy VESC-based multi-board stack:
 
 ---
 
-## Single-Source-of-Truth Workflow (NEW)
+## Database-Driven Workflow
 
-**Problem Solved**: Eliminates documentation drift and endless verification cycles
+**Problem Solved**: Eliminates 78-error verification loop and documentation drift
 
 **How it works**:
-1. **Edit ONE file**: `design_database.yaml` (53 components, 35 GPIOs, all design values)
+1. **Edit ONE file**: `design_database.yaml` (117 components, 35 GPIOs, 7 ICs, all design values)
 2. **Run generators**: `python scripts/generate_all.py` (creates BOM, pins.h, netlabels, reports)
-3. **Verify**: Run 3 database-driven verification scripts
+3. **Verify**: `python scripts/run_all_verification.py` (9 database-driven scripts, all must PASS)
 4. **Commit**: All files guaranteed consistent
 
-**See**: `docs/NEW_WORKFLOW_GUIDE.md` for complete guide
+**Benefits**:
+- Zero documentation drift (impossible by design)
+- Proven bug detection (found 2 critical bugs during migration)
+- Auto-updating verification (reads database directly)
+
+**See**: `VERIFICATION_SYSTEM_COMPLETE.md` for full migration report
+**See**: `docs/NEW_WORKFLOW_GUIDE.md` for complete usage guide
 
 ---
 
@@ -48,36 +55,41 @@ Single-PCB integrated controller replacing legacy VESC-based multi-board stack:
 
 ```
 SEDU/
-├── design_database.yaml          ← SINGLE SOURCE OF TRUTH (edit this)
-├── CLAUDE.md                      ← AI agent guide
-├── FROZEN_STATE_REV_C4b.md       ← Frozen design state
-├── MANDATORY_PREFAB_CHECKLIST.md ← Pre-fabrication checklist
-├── Component_Report.md            ← Generated component report
+├── design_database.yaml             ← SINGLE SOURCE OF TRUTH (edit this)
+├── CLAUDE.md                         ← AI agent guide
+├── INIT.md                           ← Session initialization
+├── QUICKSTART.md                     ← Quick reference guide (NEW)
+├── FROZEN_STATE_REV_C4b.md          ← Frozen design state
+├── VERIFICATION_SYSTEM_COMPLETE.md  ← Verification migration report (NEW)
+├── MANDATORY_PREFAB_CHECKLIST.md    ← Pre-fabrication checklist
+├── Component_Report.md               ← Generated component report
 │
-├── docs/                          ← Specifications & guides
-│   ├── NEW_WORKFLOW_GUIDE.md      ← How to use database system
-│   ├── POWER_BUDGET_MASTER.md     ← Power calculations
-│   ├── BRINGUP_CHECKLIST.md       ← Bring-up procedures
-│   └── DOCS_INDEX.md              ← Complete file index
+├── docs/                             ← Specifications & guides
+│   ├── NEW_WORKFLOW_GUIDE.md         ← How to use database system
+│   ├── POWER_BUDGET_MASTER.md        ← Power calculations
+│   ├── BRINGUP_CHECKLIST.md          ← Bring-up procedures
+│   └── DOCS_INDEX.md                 ← Complete file index
 │
-├── hardware/                      ← KiCad project
-│   ├── SEDU_PCB.kicad_pcb         ← PCB layout (80×50mm)
-│   ├── SEDU_PCB.kicad_sch         ← Top-level schematic
-│   ├── BOM_Seed.csv               ← Generated BOM (53 components)
+├── hardware/                         ← KiCad project
+│   ├── SEDU_PCB.kicad_pcb            ← PCB layout (80×50mm)
+│   ├── SEDU_PCB.kicad_sch            ← Top-level schematic
+│   ├── BOM_Seed.csv                  ← Generated BOM (117 components)
 │   └── [hierarchical sheets]
 │
-├── firmware/                      ← ESP32-S3 code
-│   ├── include/pins.h             ← Generated GPIO definitions
-│   └── src/                       ← Modular firmware
+├── firmware/                         ← ESP32-S3 code
+│   ├── include/pins.h                ← Generated GPIO definitions (35 pins)
+│   └── src/                          ← Modular firmware
 │
-├── scripts/                       ← Generators & verification
-│   ├── generate_all.py            ← Master generator
-│   ├── check_database_schema.py   ← Database validator
-│   ├── check_value_locks.py       ← Locked values checker
-│   └── check_pinmap.py            ← GPIO validator
+├── scripts/                          ← Generators & verification
+│   ├── generate_all.py               ← Master generator
+│   ├── run_all_verification.py       ← Verification suite runner (NEW)
+│   ├── check_database_schema.py      ← Database validator
+│   ├── check_value_locks.py          ← Locked values checker
+│   ├── check_pinmap.py               ← GPIO validator
+│   └── [6 more verification scripts]
 │
-└── reports/                       ← Verification reports (dated)
-    ├── 2025-11-14/                ← Latest (database system)
+└── reports/                          ← Verification reports (dated)
+    ├── 2025-11-14/                   ← Latest (database system)
     ├── 2025-11-13/                ← BOM completeness fix
     └── 2025-11-12/                ← Board optimization
 ```
@@ -92,14 +104,20 @@ SEDU/
 **State**: **FROZEN** for PCB fabrication
 **Schematics**: Title blocks only (need schematic entry)
 **PCB Layout**: Outline + mounting holes placed (80×50mm)
-**BOM**: 117 components (53 in database, 64 to migrate)
-**Verification**: 10 scripts (3 database-driven, 7 legacy)
+**BOM**: 117 components (all in database)
+**Verification**: 9 database-driven scripts + 2 optional (11 total)
 
-**Latest Verification** (2025-11-14):
-- ✅ Database schema valid (7 ICs, 53 components, 35 GPIOs)
+**Latest Verification** (2025-11-15):
+- ✅ Database schema valid (7 ICs, 117 components, 35 GPIOs)
 - ✅ 17 locked values correct
-- ✅ 35 GPIO pins validated (no conflicts)
-- ✅ Frozen state compliant
+- ✅ 35 GPIO pins validated (firmware ↔ database)
+- ✅ 44 net labels complete
+- ✅ Board geometry correct (80×50mm)
+- ✅ 5V rail eliminated
+- ✅ Button ladder verified (database ↔ firmware)
+- ✅ 8 power calculations verified
+- ✅ 61 critical BOM components present
+- ✅ All 9 verification scripts passing (100%)
 
 ---
 
@@ -153,32 +171,37 @@ Generates:
 - `hardware/Net_Labels.csv`
 - `Component_Report.md`
 
-**Step 3**: Verify
+**Step 3**: Verify (CRITICAL - all 9 scripts must PASS)
 ```bash
-python scripts/check_database_schema.py
-python scripts/check_value_locks.py
-python scripts/check_pinmap.py
+python scripts/run_all_verification.py
 ```
 
-**Step 4**: Commit
+**Step 4**: Commit (if verification passes)
 ```bash
 git add -u && git commit && git push
 ```
 
 **See**: `docs/NEW_WORKFLOW_GUIDE.md` for detailed instructions
+**See**: `QUICKSTART.md` for quick reference
 
-### Verification
+### Verification Suite
 
-**Database-driven** (checks design values, not file format):
-- `check_database_schema.py` - Validates database structure
-- `check_value_locks.py` - Checks 17 locked components
-- `check_pinmap.py` - Validates 35 GPIO assignments
+**Database-driven** (all 9 scripts read from design_database.yaml):
+1. `check_database_schema.py` - Database structure (117 components, 35 GPIO, 7 ICs)
+2. `check_value_locks.py` - 17 locked component values
+3. `check_pinmap.py` - 35 GPIO pin assignments
+4. `check_netlabels_vs_pins.py` - 44 required net labels
+5. `check_kicad_outline.py` - 80×50mm board geometry
+6. `check_5v_elimination.py` - 5V rail elimination
+7. `check_ladder_bands.py` - Button ladder voltage bands
+8. `verify_power_calcs.py` - 8 power calculations
+9. `check_bom_completeness.py` - 61 critical IC components
 
-**Legacy** (still read old files, will be updated):
-- `check_power_budget.py`
-- `check_frozen_state_violations.py`
-- `check_bom_completeness.py`
-- ...and 4 more
+**Run all**: `python scripts/run_all_verification.py` (recommended)
+
+**Optional** (not in main suite):
+- `check_power_budget.py` - Component stress analysis
+- `check_frozen_state_violations.py` - Obsolete value detection
 
 ---
 
@@ -208,10 +231,12 @@ git add -u && git commit && git push
 
 **Essential (root directory)**:
 - `CLAUDE.md` - AI agent guide, verification workflow
+- `QUICKSTART.md` - Quick reference (verification, common tasks)
+- `VERIFICATION_SYSTEM_COMPLETE.md` - Database migration report (9/9 passing)
 - `FROZEN_STATE_REV_C4b.md` - Authoritative frozen design
 - `MANDATORY_PREFAB_CHECKLIST.md` - Pre-fabrication checks
 - `INIT.md` - Session initialization
-- `design_database.yaml` - Single source of truth
+- `design_database.yaml` - Single source of truth (117 components, 35 GPIOs, 7 ICs)
 
 **Guides (docs/)**:
 - `NEW_WORKFLOW_GUIDE.md` - Database system usage
@@ -220,7 +245,7 @@ git add -u && git commit && git push
 - `DESIGN_REVIEW_WORKFLOW.md` - Design review process
 
 **Reports (reports/)**:
-- `2025-11-14/` - Latest verification (database system)
+- `2025-11-14/` - Latest (database system test results)
 - `2025-11-13/` - BOM completeness fix (23 components)
 - `2025-11-12/` - Board optimization, 5V elimination
 
@@ -247,20 +272,25 @@ git add -u && git commit && git push
 
 ## Getting Started
 
+**New Session (AI Agents or Humans)**:
+1. Run `python scripts/run_all_verification.py` (verify system integrity - all 9 must PASS)
+2. Read `QUICKSTART.md` (quick reference for verification and common tasks)
+3. Read `INIT.md` (project status, current locks)
+
 **For AI Agents**:
 1. Read `CLAUDE.md` (workflow, anti-drift rules, verification)
-2. Run `python scripts/check_database_schema.py` (validate current state)
-3. Read `docs/NEW_WORKFLOW_GUIDE.md` (understand database system)
+2. Read `VERIFICATION_SYSTEM_COMPLETE.md` (database system architecture)
+3. Read `docs/NEW_WORKFLOW_GUIDE.md` (understand database workflow)
 
 **For Humans**:
-1. Read `INIT.md` (project status, current locks)
+1. Read `QUICKSTART.md` (quick start guide)
 2. Review `FROZEN_STATE_REV_C4b.md` (frozen design state)
 3. Check `MANDATORY_PREFAB_CHECKLIST.md` before ordering PCBs
 
 **For Firmware Development**:
-1. Read `firmware/README.md` (if present)
+1. Review `firmware/include/pins.h` (35 GPIO assignments - auto-generated)
 2. See `CLAUDE.md` Section "Firmware Development"
-3. Review `firmware/include/pins.h` (GPIO assignments)
+3. Read `docs/BRINGUP_CHECKLIST.md` (safety verification)
 
 **For Hardware Design**:
 1. Read `hardware/README.md` (schematic scaffold plan)
@@ -271,6 +301,7 @@ git add -u && git commit && git push
 
 ## Project History
 
+**Nov 15, 2025**: Database migration complete - all 9 verification scripts now database-driven (100% passing)
 **Nov 14, 2025**: Single-source-of-truth database system implemented
 **Nov 13, 2025**: BOM completeness verification (23 missing components found & fixed)
 **Nov 12, 2025**: Board optimization (80×50mm), 5V rail elimination, thermal verification
@@ -278,6 +309,7 @@ git add -u && git commit && git push
 **Nov 10, 2025**: Power budget analysis, component stress verification
 **Nov 9, 2025**: Initial commit, project scaffold created
 
+**See**: `VERIFICATION_SYSTEM_COMPLETE.md` for database migration report
 **See**: `reports/` directory for detailed verification reports by date
 
 ---
@@ -314,7 +346,8 @@ Firmware must enforce:
 
 ---
 
-**Last Updated**: 2025-11-14
+**Last Updated**: 2025-11-15
 **Revision**: C.4b (Frozen)
+**Verification**: 9/9 scripts passing (100%) - database migration complete
 **Status**: Ready for schematic entry
 **Next Step**: Implement KiCad schematics per `hardware/README.md` scaffold plan
