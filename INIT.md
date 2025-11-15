@@ -1,9 +1,28 @@
 # Session Init
 
-1. Read `AGENTS.md` for contributor expectations.  
-2. Review `docs/PROJECT_RULES.md` to understand documentation layers, change logging, and tool-version recording.  
-3. Check `docs/archive/CHANGELOG.md` for the latest decisions before editing anything.  
-4. Log new findings (calculations, tool behaviors, design changes) in a dated note under `docs/`, then summarize in the changelog when finalized.  
+## 🚀 Quick Start (New Session)
+
+**Run verification suite to confirm system integrity:**
+```bash
+python scripts/run_all_verification.py
+```
+
+This runs all 9 verification scripts and reports overall PASS/FAIL status. All scripts must pass before making changes.
+
+**Key Context Documents:**
+1. `VERIFICATION_SYSTEM_COMPLETE.md` - Database-driven verification system overview
+2. `FROZEN_STATE_REV_C4b.md` - Locked design values (Rev C.4b)
+3. `CLAUDE.md` - Project instructions and workflow
+4. `docs/SESSION_STATUS.md` - Current development state
+
+---
+
+## Standard Init Checklist
+
+1. Read `AGENTS.md` for contributor expectations.
+2. Review `docs/PROJECT_RULES.md` to understand documentation layers, change logging, and tool-version recording.
+3. Check `docs/archive/CHANGELOG.md` for the latest decisions before editing anything.
+4. Log new findings (calculations, tool behaviors, design changes) in a dated note under `docs/`, then summarize in the changelog when finalized.
 5. Treat legacy VESC information as reference only; all forward work must align with `New Single Board Idea.md` and `Datasheet_Notes.md`.
 6. Legacy hardware stack = 24 V battery -> VESC 4.12 -> ElectroCraft RPX32 BLDC, VESC 5 V -> ESP32-C6 dev board (UART to VESC, SPI to GC9A01 LCD, GPIO to DRV8871 actuator driver), plus the two-button resistor ladder into one ADC; preserve this behavior in every redesign note.
 7. The single-board effort must keep identical operator states/safety interlocks as the aerospace PFD harness while integrating quality-of-life upgrades (dedicated bucks, hot-swap, better docs); call out any deviation from the original wiring/BOM in both schematic notes and component logs.
@@ -14,17 +33,32 @@
 
 **Why**: Past issues (e.g., battery divider mismatch where firmware and spec had different values) were caused by updating one file but missing others. This rule prevents documentation drift. All values now locked in FROZEN_STATE_REV_C4b.md.
 
-**Required Commands** (ALL must PASS before considering fix complete):
+### **Quick Verification (Recommended)** ⚡
+
+Run the complete verification suite with a single command:
+
 ```bash
-# Core verification suite (run in order)
+python scripts/run_all_verification.py
+```
+
+**Expected result:** All 9 scripts must PASS before considering fix complete.
+
+### **Individual Scripts** (for debugging specific failures)
+
+```bash
+# Core verification suite (database-driven)
+python scripts/check_database_schema.py       # Database schema validation
 python scripts/check_value_locks.py           # Critical component values consistent
 python scripts/check_pinmap.py                # Firmware ↔ documentation GPIO map
-python scripts/check_power_budget.py          # Component ratings vs applied stress
 python scripts/check_netlabels_vs_pins.py     # Schematic net label consistency
 python scripts/check_kicad_outline.py         # PCB geometry (80×50mm, M3 holes)
-python scripts/verify_power_calcs.py          # Power calculations verification
 python scripts/check_5v_elimination.py        # 5V rail elimination verified
 python scripts/check_ladder_bands.py          # Button ladder thresholds
+python scripts/verify_power_calcs.py          # Power calculations verification
+python scripts/check_bom_completeness.py      # BOM completeness (critical IC components)
+
+# Optional (not in main suite)
+python scripts/check_power_budget.py          # Component ratings vs applied stress
 python scripts/check_frozen_state_violations.py # No obsolete values (CRITICAL)
 ```
 
@@ -69,21 +103,19 @@ Bring-up confirmations (locked values; verify on bench):
 
 ## Quick Start (Novice-Friendly)
 
-1. Run verifiers (see "MANDATORY VERIFICATION AFTER ANY FIX" section above):
-   - `python3 scripts/check_value_locks.py` (LM5069-1, DRV8873 ILIM/IPROPI, battery divider 140kΩ/10kΩ, board size)
-   - `python3 scripts/check_pinmap.py` (doc ↔ firmware pins)
-   - `python3 scripts/check_power_budget.py` (component ratings vs stress; exit code 1 expected for known issues)
-   - `python3 scripts/check_netlabels_vs_pins.py` (required net labels exist)
-   - `python3 scripts/check_kicad_outline.py` (board size 80×50 mm and 4× M3 holes present)
-   - `python3 scripts/verify_power_calcs.py` (power calculations verification)
-   - `python3 scripts/check_policy_strings.py` (no banned legacy strings reintroduced)
-   - `python3 scripts/check_kicad_versions.py` (report file format versions; ok to upgrade on save)
-   - `rg -n -S "TLV75533|TPS22919" docs/ Component_Report.md` (USB policy present)
-   - `rg -n -S "GC9A01|MISO NC|CS_LCD|GPIO16" docs/ New\ Single\ Board\ Idea.md Component_Report.md` (LCD locks present)  
-2. Program firmware (battery disconnected): plug USB-C; confirm logs show battery %, ladder state, RPM=0.  
-3. Battery-only test: disconnect USB; power from battery; verify the tool cannot power from USB alone.  
-4. Buttons: press Start/Stop; confirm ladder bands and discrete GPIOs both gate motion.  
-5. Actuator sanity: brief extend pulses; adjust ILIM in firmware once current is known.  
+1. **Verify system integrity** (all 9 verification scripts must PASS):
+   ```bash
+   python scripts/run_all_verification.py
+   ```
+   This validates: component values, GPIO pins, net labels, board geometry, 5V elimination, button ladder, power calcs, and BOM completeness.
+
+2. **Program firmware** (battery disconnected): plug USB-C; confirm logs show battery %, ladder state, RPM=0.
+
+3. **Battery-only test**: disconnect USB; power from battery; verify the tool cannot power from USB alone.
+
+4. **Buttons**: press Start/Stop; confirm ladder bands and discrete GPIOs both gate motion.
+
+5. **Actuator sanity**: brief extend pulses; adjust ILIM in firmware once current is known.  
 
 ## Tools & File Layout
 

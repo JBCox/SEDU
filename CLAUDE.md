@@ -30,15 +30,10 @@ If ANY script fails, commit is BLOCKED. This prevents frozen state violations fr
 
 **Verification Command** (must return 100% PASS):
 ```bash
-python scripts/check_value_locks.py && \
-python scripts/check_pinmap.py && \
-python scripts/check_power_budget.py && \
-python scripts/verify_power_calcs.py && \
-python scripts/check_netlabels_vs_pins.py && \
-python scripts/check_kicad_outline.py && \
-python scripts/check_5v_elimination.py && \
-python scripts/check_ladder_bands.py
+python scripts/run_all_verification.py
 ```
+
+This runs all 9 database-driven verification scripts. All must PASS before making changes.
 
 ---
 
@@ -58,17 +53,41 @@ python scripts/check_ladder_bands.py
 
 **Why**: Past issues (battery divider mismatch, power rating errors) were caused by updating one file but missing others. This prevents documentation drift.
 
-**Core Verification Suite** (run in this order, ALL must PASS):
+### **Quick Verification (Recommended)** ⚡
+
+Run the complete verification suite with a single command:
 
 ```bash
-# 1. Critical value locks (component values, battery divider, board size)
+python scripts/run_all_verification.py
+```
+
+**What it does:**
+- Runs all 9 database-driven verification scripts in sequence
+- Shows real-time output from each script
+- Provides summary with PASS/FAIL count
+- Returns exit code 0 if all pass, 1 if any fail
+
+**Expected output (all passing):**
+```
+[PASS] VERIFICATION SUITE PASSED
+   All verification scripts passed successfully
+   System integrity verified
+Total: 9/9 passed
+```
+
+### **Individual Verification Scripts** (for debugging specific areas)
+
+If you need to debug a specific verification failure, run scripts individually:
+
+```bash
+# 1. Database schema validation
+python scripts/check_database_schema.py
+
+# 2. Critical value locks (component values, battery divider, board size)
 python scripts/check_value_locks.py
 
-# 2. Pin mapping (firmware ↔ documentation GPIO assignments)
+# 3. Pin mapping (firmware ↔ documentation GPIO assignments)
 python scripts/check_pinmap.py
-
-# 3. Power budget (component ratings vs applied stress)
-python scripts/check_power_budget.py  # Exit code 1 expected for known issues
 
 # 4. Net label consistency (schematic ↔ firmware)
 python scripts/check_netlabels_vs_pins.py
@@ -76,24 +95,23 @@ python scripts/check_netlabels_vs_pins.py
 # 5. Board geometry (80×50mm, 4× M3 holes)
 python scripts/check_kicad_outline.py
 
-# 6. Power calculations verification
-python scripts/verify_power_calcs.py
-
-# 7. 5V rail elimination verification
+# 6. 5V rail elimination verification
 python scripts/check_5v_elimination.py
 
-# 8. Button ladder verification
+# 7. Button ladder verification
 python scripts/check_ladder_bands.py
+
+# 8. Power calculations verification
+python scripts/verify_power_calcs.py
 
 # 9. BOM completeness verification (CRITICAL - ensures all datasheet-required components present)
 python scripts/check_bom_completeness.py
 
-# 10. Frozen state violations (CRITICAL - prevents old values from creeping back)
-python scripts/check_frozen_state_violations.py
-
-# Optional:
-python scripts/check_policy_strings.py  # Legacy banned strings
-python scripts/check_docs_index.py      # Documentation tracking
+# Optional (not in main suite):
+python scripts/check_power_budget.py          # Exit code 1 expected for known thermal issues
+python scripts/check_frozen_state_violations.py  # Prevents obsolete values
+python scripts/check_policy_strings.py        # Legacy banned strings
+python scripts/check_docs_index.py            # Documentation tracking
 ```
 
 **When to Run**:
@@ -402,17 +420,23 @@ Runs verification scripts automatically on commit (`.pre-commit-config.yaml` if 
 
 ## Resuming Work
 
-1. Read `docs/SESSION_STATUS.md` for current development state
-2. Check `AI_COLLABORATION.md` for pending proposals/discussions
-3. Run all verification scripts to confirm no drift
-4. Review latest entries in changelog (`docs/archive/CHANGELOG.md`)
+1. **Run verification suite** to confirm system integrity:
+   ```bash
+   python scripts/run_all_verification.py
+   ```
+   All 9 scripts must PASS before starting work.
 
-**Quick context check**:
-```bash
-python scripts/check_pinmap.py
-python scripts/check_value_locks.py
-python scripts/check_docs_index.py
-```
+2. **Read context documents**:
+   - `QUICKSTART.md` - Quick reference guide
+   - `VERIFICATION_SYSTEM_COMPLETE.md` - Database system overview
+   - `docs/SESSION_STATUS.md` - Current development state
+   - `AI_COLLABORATION.md` - Pending proposals/discussions
+   - `docs/archive/CHANGELOG.md` - Latest decisions
+
+3. **Confirm database-driven workflow**:
+   - Only edit `design_database.yaml` (single source of truth)
+   - Run `python scripts/generate_all.py` after database changes
+   - Never manually edit generated files (BOM, pins.h, etc.)
 
 ---
 
