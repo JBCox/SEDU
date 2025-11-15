@@ -20,7 +20,12 @@
       "Bash(fi)",
       "Bash(findstr:*)",
       "Bash(echo:*)",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nfix: Add 10 critical missing components and update documentation\n\nCRITICAL BOM ADDITIONS (10 components):\n\nDeep Verification (6 components):\n- RFBT, RFBB: LMR33630 feedback resistors (100kΩ, 43.2kΩ) for 3.3V regulation\n- R_USB_DP, R_USB_DM: 22Ω USB series resistors (GPIO19/20) for signal integrity\n- C_VDD_CPU, C_VDD_RTC, C_VDD_SPI: ESP32-S3 VDD decoupling capacitors\n\nMulti-Agent Verification (4 components):\n- C_TPS22919_IN, C_TPS22919_OUT: 1µF load switch caps for stable operation\n- C_TLV75533_IN, C_TLV75533_OUT: 1µF input + 10µF output caps (CRITICAL for LDO stability)\n\nDOCUMENTATION UPDATES:\n- Added CSS2H-2512K-2L00F MPN to 4 files (README_FOR_CODEX.md, INIT.md, Component_Report.md, SEDU_PCB_Sheet_Index.md)\n- Prevents wrong part selection (R suffix 3W vs K suffix 5W required for 20A peaks)\n\nBOARD SIZE OPTIMIZATION:\n- Updated from 75×55mm to 80×50mm (fits credit card 85.6×54mm, easier routing)\n- New mounting holes: (4,4), (76,4), (4,46), (76,46)\n- Frozen state checker updated to ban obsolete dimensions\n\nVERIFICATION STATUS:\n✅ check_value_locks.py - PASS (27 critical values consistent)\n✅ check_pinmap.py - PASS (GPIO map matches SSOT)\n✅ check_frozen_state_violations.py - PASS (no obsolete values)\n✅ check_power_budget.py - PASS (2 accepted thermal exceptions)\n✅ verify_power_calcs.py - PASS (17 calculations verified correct)\n✅ check_kicad_outline.py - PASS (80×50mm verified)\n✅ check_netlabels_vs_pins.py - PASS (net labels complete)\n✅ check_ladder_bands.py - PASS (SSOT ↔ firmware consistent)\n\nNEW VERIFICATION REPORTS:\n- CLEAN_SWEEP_FINAL_STATUS.md: Found C_BOOT, C_VCC missing\n- DEEP_VERIFICATION_REPORT.md: Datasheet-driven verification found 6 missing components\n- FINAL_MULTI_AGENT_VERIFICATION_REPORT.md: 4 parallel agents found TLV75533/TPS22919 caps missing\n- FROZEN_STATE_REV_C4b.md: Authoritative frozen design state document\n- MANDATORY_PREFAB_CHECKLIST.md: 10-section pre-fabrication verification checklist\n\nPROJECT STATUS: Ready for schematic entry (schematics currently empty title blocks only)\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(pip install:*)"
     ],
     "deny": [],
     "ask": []

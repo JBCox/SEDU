@@ -1,137 +1,145 @@
 #!/usr/bin/env python3
-"""Cross-check critical value locks across key docs to prevent drift.
-
-Checks (hard-coded for Rev C.4x):
-- LM5069 variant is '-1' in: SSOT, INIT, Component_Report, README_FOR_CODEX
-- DRV8873 locks: R_ILIM = 1.58 kΩ, R_IPROPI = 1.00 kΩ present in: SSOT, INIT, Component_Report, README_FOR_CODEX
-- RS_IN: WSLP2728 (3.0mΩ) - verified substitute for CSS2H-2728R-L003F
-- RS_U/V/W: CSS2H-2512K-2L00F (2.0mΩ, 5W) - K-suffix variant with verified power rating
-- Battery divider: RUV_TOP = 140kΩ, RUV_BOT = 10.0kΩ in BOM matches SSOT and firmware calibration
-- Board size '80 × 50 mm' present in: SSOT or Mounting, and INIT
-
-Exit codes: 0 = OK, 1 = mismatches found
 """
-from __future__ import annotations
+SEDU Value Locks Verification - Database-Driven
 
-import pathlib
-import re
+Validates that critical locked design values in design_database.yaml
+are correct and haven't been accidentally changed.
+
+This script checks THE DATABASE ITSELF, not generated files.
+Generated files are checked separately by check_generated_files.py
+
+Returns 0 if all locked values correct, 1 if violations found.
+"""
+
 import sys
+from pathlib import Path
+import yaml
 
-ROOT = pathlib.Path(__file__).resolve().parents[1]
 
-FILES = {
-    "SSOT": ROOT / "docs" / "SEDU_Single_PCB_Parity_Corrected_RevC4a_Final.md",
-    "INIT": ROOT / "INIT.md",
-    "REPORT": ROOT / "Component_Report.md",
-    "GUIDE": ROOT / "README_FOR_CODEX.md",
-}
+def load_database():
+    """Load design database from YAML."""
+    db_path = Path(__file__).parent.parent / "design_database.yaml"
+    if not db_path.exists():
+        print(f"[ERROR] Database not found: {db_path}")
+        sys.exit(1)
 
-def contains(path: pathlib.Path, pattern: str) -> bool:
-    if not path.exists():
-        return False
-    text = path.read_text(encoding="utf-8", errors="ignore")
-    return re.search(pattern, text, flags=re.IGNORECASE) is not None
+    with open(db_path, 'r', encoding='utf-8') as f:
+        return yaml.safe_load(f)
 
-def present(path: pathlib.Path, patterns: list[str]) -> list[str]:
-    missing = []
-    text = path.read_text(encoding="utf-8") if path.exists() else ""
-    for pat in patterns:
-        if not re.search(pat, text, flags=re.IGNORECASE):
-            missing.append(pat)
-    return missing
 
-def main() -> int:
-    rc = 0
-    # LM5069-1 latch-off
-    pats_lm5069 = [r"LM5069-1", r"latch\s*[-\u2010-\u2015]?\s*off"]
-    # DRV8873 locks (allow 1.0 or 1.00 formatting)
-    pats_drv = [r"R[_ ]?ILIM\s*=\s*1\.58\s*k", r"R[_ ]?IPROPI\s*=\s*1\.0+\s*k"]
-    # Board size (optimized from 80×60mm baseline via 75×55mm intermediate)
-    pats_size = [r"80\s*[×x]\s*50\s*mm"]
+def check_locked_values():
+    """Verify all locked component values are correct."""
+    db = load_database()
 
-    for label, path in FILES.items():
-        missing = present(path, pats_lm5069 + pats_drv)
-        if missing:
-            print(f"[locks] {label}: missing {', '.join(missing)} in {path}")
-            rc = 1
+    # Expected locked values (frozen for Rev C.4b)
+    EXPECTED_LOCKS = {
+        'RS_IN': {'value': '3.0m', 'reason': 'LM5069 ILIM calculation'},
+        'R_ILIM': {'value': '1.58k', 'reason': 'DRV8873 current limit'},
+        'R_IPROPI': {'value': '1.00k', 'reason': 'DRV8873 IPROPI scaling'},
+        'R_VBAT_TOP': {'value': '140k', 'reason': 'Battery divider calculation'},
+        'R_VBAT_BOT': {'value': '10k', 'reason': 'Battery divider calculation'},
+        'RS_U': {'value': '2.0m', 'reason': 'Motor CSA calculation'},
+        'RS_V': {'value': '2.0m', 'reason': 'Motor CSA calculation'},
+        'RS_W': {'value': '2.0m', 'reason': 'Motor CSA calculation'},
+        'RFBT': {'value': '100k', 'reason': 'LMR33630 3.3V output'},
+        'RFBB': {'value': '43.2k', 'reason': 'LMR33630 3.3V output'},
+        'C_CPLCPH': {'value': '47nF', 'reason': 'DRV8353 charge pump'},
+        'CDVDT': {'value': '33nF', 'reason': 'LM5069 dV/dt control'},
+        'L4': {'value': '10uH', 'reason': 'LMR33630 inductor'},
+        'RUV_TOP': {'value': '140k', 'reason': 'LM5069 UV threshold'},
+        'RUV_BOT': {'value': '10k', 'reason': 'LM5069 UV threshold'},
+        'ROV_TOP': {'value': '221k', 'reason': 'LM5069 OV threshold'},
+        'ROV_BOT': {'value': '10k', 'reason': 'LM5069 OV threshold'},
+    }
 
-    # BOM path for subsequent checks
-    bom_path = ROOT / "hardware" / "BOM_Seed.csv"
+    components = db.get('components', {})
 
-    # Rsense lock (3.0 mΩ) must appear in SSOT and Schematic_Place_List.csv
-    ssot_ok = contains(FILES["SSOT"], r"3\.0\s*m[ΩOhm]") and contains(FILES["SSOT"], r"ILIM\s*≈?\s*18")
-    bom_ok = contains(ROOT / "hardware" / "Schematic_Place_List.csv", r"RS_IN,\s*3\.0\s*m[ΩOhm]")
-    if not ssot_ok:
-        print("[locks] Rsense 3.0 mΩ and ILIM≈18 A not confirmed in SSOT")
-        rc = 1
-    if not bom_ok:
-        print("[locks] RS_IN not set to 3.0 mΩ in hardware/Schematic_Place_List.csv")
-        rc = 1
+    all_pass = True
+    violations = []
 
-    # RS_IN specific MPN lock (WSLP2728 - verified substitute for CSS2H-2728R-L003F)
-    rs_in_mpn_ok = contains(bom_path, r"RS_IN,\s*WSLP2728")
-    if not rs_in_mpn_ok:
-        print("[locks] RS_IN MPN not set to WSLP2728 in BOM_Seed.csv")
-        print("        (WSLP2728 is verified substitute for CSS2H-2728R-L003F)")
-        rc = 1
+    print("=" * 70)
+    print("SEDU VALUE LOCKS VERIFICATION (Database-Driven)")
+    print("=" * 70)
+    print()
 
-    # Phase shunt locks (RS_U/V/W: CSS2H-2512K-2L00F, 2.0mΩ, 5W verified)
-    rs_u_mpn_ok = contains(bom_path, r"RS_U,\s*CSS2H-2512K-2L00F")
-    rs_u_value_ok = contains(bom_path, r"RS_U,.*2\s*m[ΩOhm]")
-    rs_u_rating_ok = contains(bom_path, r"RS_U,.*5W")
-    if not rs_u_mpn_ok:
-        print("[locks] RS_U MPN not set to CSS2H-2512K-2L00F in BOM_Seed.csv")
-        print("        (CSS2H-2512K-2L00F is K-suffix variant with 5W verified rating)")
-        rc = 1
-    if not rs_u_value_ok:
-        print("[locks] RS_U value not set to 2mΩ in BOM_Seed.csv")
-        rc = 1
-    if not rs_u_rating_ok:
-        print("[locks] RS_U power rating (5W) not documented in BOM_Seed.csv notes")
-        rc = 1
+    # Check each expected locked value
+    for ref, expected in EXPECTED_LOCKS.items():
+        if ref not in components:
+            print(f"[FAIL] {ref:15s} MISSING from database")
+            violations.append(f"{ref}: Component missing from design_database.yaml")
+            all_pass = False
+            continue
 
-    # Battery divider lock (140kΩ / 10.0kΩ) must match across BOM, SSOT, and firmware
-    bom_ruv_top_ok = contains(bom_path, r"RUV_TOP,\s*ERA-3AEB1403V") and contains(bom_path, r"140\s*k[ΩOhm]")
-    bom_ruv_bot_ok = contains(bom_path, r"RUV_BOT,\s*ERA-3AEB1002V") and contains(bom_path, r"10\.0\s*k[ΩOhm]")
-    ssot_divider_ok = contains(FILES["SSOT"], r"140\s*k[ΩOhm]\s*/\s*10\.0\s*k[ΩOhm]")
+        comp = components[ref]
+        actual_value = comp.get('value', 'NOT SET')
+        is_locked = comp.get('locked', False)
+        expected_value = expected['value']
 
-    if not bom_ruv_top_ok:
-        print("[locks] Battery divider RUV_TOP not set to 140kΩ (ERA-3AEB1403V) in BOM_Seed.csv")
-        rc = 1
-    if not bom_ruv_bot_ok:
-        print("[locks] Battery divider RUV_BOT not set to 10.0kΩ (ERA-3AEB1002V) in BOM_Seed.csv")
-        rc = 1
-    if not ssot_divider_ok:
-        print("[locks] Battery divider 140kΩ/10.0kΩ not documented in SSOT")
-        rc = 1
+        # Normalize values for comparison (handle different formats)
+        def normalize_value(v):
+            v = str(v).lower().replace('ohm', '').replace('f', 'F')
+            v = v.replace('h', 'H')
+            return v.strip()
 
-    # Firmware calibration check (optional - verify sensors.cpp has correct cal values)
-    sensors_path = ROOT / "firmware" / "src" / "sensors.cpp"
-    if sensors_path.exists():
-        # Check for correct calibration: {1489, 18.0f, 2084, 25.2f}
-        cal_ok = contains(sensors_path, r"1489,\s*18\.0f,\s*2084,\s*25\.2f")
-        if not cal_ok:
-            print("[locks] Battery calibration in sensors.cpp doesn't match 140kΩ/10kΩ divider")
-            print("        Expected: kBatteryCal{1489, 18.0f, 2084, 25.2f}")
-            rc = 1
+        actual_norm = normalize_value(actual_value)
+        expected_norm = normalize_value(expected_value)
 
-    # Board size must be in SSOT (or mounting) and INIT
-    ssot_ok = not present(FILES["SSOT"], pats_size)
-    init_ok = not present(FILES["INIT"], pats_size)
-    if not ssot_ok:
-        # try mounting file
-        mount = ROOT / "hardware" / "Mounting_And_Envelope.md"
-        ssot_ok = not present(mount, pats_size)
-    if not ssot_ok:
-        print("[locks] Board size 80×50 mm missing in SSOT/Mounting")
-        rc = 1
-    if not init_ok:
-        print("[locks] Board size 80×50 mm missing in INIT.md")
-        rc = 1
+        if actual_norm != expected_norm:
+            print(f"[FAIL] {ref:15s} value mismatch: expected {expected_value}, got {actual_value}")
+            violations.append(f"{ref}: Expected {expected_value}, found {actual_value}")
+            all_pass = False
+        elif not is_locked:
+            print(f"[WARN] {ref:15s} value correct ({actual_value}) but NOT marked as locked")
+            violations.append(f"{ref}: Not marked as locked in database")
+            all_pass = False
+        else:
+            print(f"[OK]   {ref:15s} = {actual_value} (locked)")
 
-    if rc == 0:
-        print("[locks] Critical value locks consistent. PASS")
-    return rc
+    # Check board geometry
+    print()
+    print("Board Geometry:")
+    print("-" * 70)
+
+    metadata = db.get('metadata', {})
+    board_size = metadata.get('board_size', 'NOT SET')
+    frozen_state = metadata.get('frozen', False)
+
+    if board_size != '80x50':
+        print(f"[FAIL] Board size: expected 80x50mm, got {board_size}")
+        violations.append(f"Board size: Expected 80x50, found {board_size}")
+        all_pass = False
+    else:
+        print(f"[OK]   Board size = {board_size}mm")
+
+    if not frozen_state:
+        print(f"[WARN] Design not marked as frozen in metadata")
+    else:
+        print(f"[OK]   Design frozen = {frozen_state}")
+
+    # Summary
+    print()
+    print("=" * 70)
+    print("SUMMARY")
+    print("=" * 70)
+
+    if all_pass:
+        print("[PASS] All locked values correct")
+        print(f"   {len(EXPECTED_LOCKS)} locked components verified")
+        print(f"   Board geometry: {board_size}mm")
+        return 0
+    else:
+        print("[FAIL] Locked value violations found")
+        print(f"   {len(violations)} violation(s):")
+        for v in violations:
+            print(f"      - {v}")
+        print()
+        print("ACTION REQUIRED:")
+        print("   1. Review violations above")
+        print("   2. Fix design_database.yaml if values are incorrect")
+        print("   3. Update FROZEN_STATE_REV_C4b.md if intentional change")
+        print("   4. Re-run: python scripts/check_value_locks.py")
+        return 1
+
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(check_locked_values())

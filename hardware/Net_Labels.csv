@@ -1,48 +1,45 @@
-net,label,notes
-3V3,3.3V logic,
-VBAT,24V battery raw,
-VBAT_PROT,24V protected after LM5069-1,
-GND,GND star near shunt,
-USB_D-,USB D-,series 22–33R near MCU
-USB_D+,USB D+,series 22–33R near MCU
-SPI_SCK,GPIO18,
-SPI_MOSI,GPIO17,
-SPI_MISO,GPIO21,DRV8353 only; LCD MISO NC
-SPI_CS_DRV,GPIO22,
-SPI_CS_LCD,GPIO16,
-LCD_DC,GPIO32,
-LCD_RST,GPIO33,
-LEDK_PWM,LEDK/PWM,
-BTN_SENSE,GPIO4,ADC1_CH3
-START_DIG,GPIO23,
-STOP_NC_DIG,GPIO24,
-HALL_A,GPIO8,
-HALL_B,GPIO9,
-HALL_C,GPIO13,
-FEED_SENSE,GPIO14,
-BUZZER,GPIO25,
-LED1,GPIO26,
-LED2,GPIO27,
-LED3,GPIO28,
-MCPWM_HS_U,GPIO38,
-MCPWM_HS_V,GPIO39,
-MCPWM_HS_W,GPIO40,
-MCPWM_LS_U,GPIO41,
-MCPWM_LS_V,GPIO42,
-MCPWM_LS_W,GPIO43,
-CSA_U_ADC,GPIO5,ADC1_CH4
-CSA_V_ADC,GPIO6,ADC1_CH5
-CSA_W_ADC,GPIO7,ADC1_CH6
-BAT_ADC,GPIO1,ADC1_CH0
-NTC_ADC,GPIO10,ADC1_CH9
-IPROPI_ADC,GPIO2,ADC1_CH1
-CC1,CC1,
-CC2,CC2,
-PHASE_U,Motor Phase U,
-PHASE_V,Motor Phase V,
-PHASE_W,Motor Phase W,
-ACT_OUT_A,Actuator OUT A,
-ACT_OUT_B,Actuator OUT B,
-SW_24V,LMR33630 switch node (24V->3.3V),
-UART_RX,UART RX,
-UART_TX,UART TX,
+Net,Type,Description
+USB_3V3,Power,"USB-derived 3.3V (TLV75533, programming only)"
+USB_5V,Power,"USB VBUS (programming only, isolated via TPS22919)"
+VBAT,Power,Battery input (6S LiPo)
+VBAT_PROT,Power,Protected 24V after LM5069 hot-swap
+VDD_3V3,Power,Main 3.3V logic rail (LMR33630 single-stage from 24V)
+V_BAT_SENSE,Input,Battery voltage (140k/10k divider) (GPIO1)
+ACT_IPROPI,Input,DRV8873 current feedback (GPIO2)
+LED_STATUS,Output,Status LED (GPIO3)
+LADDER_SENSE,Input,Button ladder voltage (GPIO4)
+CSA_U,Input,Motor phase U current sense (GPIO5)
+CSA_V,Input,Motor phase V current sense (GPIO6)
+CSA_W,Input,Motor phase W current sense (GPIO7)
+HALL_U,Input,Motor Hall sensor U (GPIO8)
+HALL_V,Input,Motor Hall sensor V (GPIO9)
+NTC_TEMP,Input,NTC temperature sensor (future) (GPIO10)
+DRV8353_nFAULT,Input,"DRV8353 fault (open-drain, 10k pullup) (GPIO11)"
+DRV8873_nFAULT,Input,"DRV8873 fault (open-drain, 10k pullup) (GPIO12)"
+HALL_W,Input,Motor Hall sensor W (GPIO13)
+LM5069_PGD,Input,"LM5069 power good (open-drain, 100k pullup) (GPIO14)"
+BUZZER,Output,Buzzer output (GPIO15)
+LCD_CS,Output,LCD chip select (GPIO16)
+DRV_MOSI,Output,DRV8353 SPI MOSI (GPIO17)
+DRV_SCK,Output,DRV8353 SPI clock (GPIO18)
+USB_DM,Bidirectional,USB D- (22Ω series) (GPIO19)
+USB_DP,Bidirectional,USB D+ (22Ω series) (GPIO20)
+DRV_MISO,Input,DRV8353 SPI MISO (GPIO21)
+DRV_CS,Output,DRV8353 SPI chip select (GPIO22)
+BTN_START,Input,"Start button (discrete, redundant) (GPIO23)"
+BTN_STOP,Input,"Stop button (discrete, NC, redundant) (GPIO24)"
+ACT_PH,Output,DRV8873 phase input (GPIO30)
+ACT_EN,Output,DRV8873 enable (PWM) (GPIO31)
+LCD_DC,Output,LCD data/command (GPIO32)
+LCD_RST,Output,LCD reset (GPIO33)
+LCD_BL,Output,LCD backlight PWM (GPIO34)
+MOTOR_HS_U,Output,Motor high-side U PWM (GPIO38)
+MOTOR_LS_U,Output,Motor low-side U PWM (GPIO39)
+MOTOR_HS_V,Output,Motor high-side V PWM (GPIO40)
+MOTOR_LS_V,Output,Motor low-side V PWM (GPIO41)
+MOTOR_HS_W,Output,Motor high-side W PWM (GPIO42)
+MOTOR_LS_W,Output,Motor low-side W PWM (GPIO43)
+GND,Power,Ground
+MOTOR_PH_U,Power,Motor phase U power
+MOTOR_PH_V,Power,Motor phase V power
+MOTOR_PH_W,Power,Motor phase W power

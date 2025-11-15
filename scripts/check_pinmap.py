@@ -1,116 +1,182 @@
 #!/usr/bin/env python3
-"""Verify that the canonical spec pin map matches firmware/include/pins.h."""
-from __future__ import annotations
+"""
+SEDU Pin Map Verification - Database-Driven
 
-import pathlib
-import re
+Validates that GPIO pin assignments in design_database.yaml are:
+1. Correct (no conflicts, valid GPIO numbers for ESP32-S3)
+2. Consistent with generated pins.h file
+
+This script checks THE DATABASE and validates generated output matches it.
+
+Returns 0 if pin map correct, 1 if violations found.
+"""
+
 import sys
-from typing import Dict, List, Sequence
-
-REPO_ROOT = pathlib.Path(__file__).resolve().parents[1]
-DOC_PATH = REPO_ROOT / "docs" / "SEDU_Single_PCB_Parity_Corrected_RevC4a_Final.md"
-PINS_PATH = REPO_ROOT / "firmware" / "include" / "pins.h"
-
-# Mapping between doc table rows and pins.h constant names
-CANONICAL_GROUPS = {
-    "USB D− / D+": ("kUsbDm", "kUsbDp"),
-    "MCPWM HS U/V/W": ("kMcpwmHsU", "kMcpwmHsV", "kMcpwmHsW"),
-    "MCPWM LS U/V/W": ("kMcpwmLsU", "kMcpwmLsV", "kMcpwmLsW"),
-    "DRV8353 SPI": ("kSpiSck", "kSpiMosi", "kSpiMiso", "kSpiCsDrv"),
-    "CSA ADCs": ("kAdcCsaU", "kAdcCsaV", "kAdcCsaW"),
-    "Battery ADC": ("kAdcBattery",),
-    "Button ladder ADC": ("kAdcLadder",),
-    "LCD (GC9A01 SPI)": ("kSpiSck", "kSpiMosi", "kSpiCsLcd"),
-    "Actuator DRV8873 PH/EN": ("kActuatorPh", "kActuatorEn"),
-    "Actuator IPROPI ADC": ("kAdcIpropi",),
-    "Start / Stop digital": ("kStartDigital", "kStopDigital"),
-    "Halls A/B/C": ("kHallA", "kHallB", "kHallC"),
-    "FEED_SENSE": ("kFeedSense",),
-}
+import re
+from pathlib import Path
+import yaml
 
 
-def parse_doc_pins(path: pathlib.Path) -> Dict[str, List[int]]:
-    lines = path.read_text(encoding="utf-8").splitlines()
-    result: Dict[str, List[int]] = {}
-    collecting = False
-    for line in lines:
-        if line.startswith("## 4. Canonical GPIO / Signal Map"):
-            collecting = True
-            continue
-        if collecting and line.startswith("## "):
-            break
-        if not collecting:
-            continue
-        stripped = line.strip()
-        if not stripped.startswith("|") or stripped.lower().startswith("| function"):
-            continue
-        cols = [col.strip() for col in stripped.strip("|").split("|")]
-        if len(cols) < 2:
-            continue
-        func, pins = cols[0], cols[1]
-        func = re.sub(r"\\*", "", func).strip()
-        gpio_values = [int(n) for n in re.findall(r"GPIO(\d+)", pins)]
-        if gpio_values:
-            result[func] = gpio_values
-    return result
+def load_database():
+    """Load design database from YAML."""
+    db_path = Path(__file__).parent.parent / "design_database.yaml"
+    if not db_path.exists():
+        print(f"[ERROR] Database not found: {db_path}")
+        sys.exit(1)
+
+    with open(db_path, 'r', encoding='utf-8') as f:
+        return yaml.safe_load(f)
 
 
-def parse_header_constants(path: pathlib.Path) -> Dict[str, int]:
-    # Capture both numeric constants and aliases (kX = kY)
-    const_pattern = re.compile(r"constexpr\s+\w+\s+(k\w+)\s*=\s*([\w\d]+)")
-    raw: Dict[str, str] = {}
-    for name, rhs in const_pattern.findall(path.read_text(encoding="utf-8")):
-        raw[name] = rhs
+def parse_generated_pins_h(path: Path):
+    """Parse generated pins.h to extract GPIO assignments."""
+    if not path.exists():
+        return {}
 
-    resolved: Dict[str, int] = {}
+    pin_map = {}
+    content = path.read_text(encoding='utf-8')
 
-    def resolve(name: str, seen: set[str]) -> int | None:
-        if name in resolved:
-            return resolved[name]
-        if name not in raw:
-            return None
-        if raw[name].isdigit():
-            resolved[name] = int(raw[name])
-            return resolved[name]
-        target = raw[name]
-        if target in seen:
-            return None
-        seen.add(target)
-        val = resolve(target, seen)
-        if val is not None:
-            resolved[name] = val
-        return val
+    # Match: #define FUNCTION_NAME   GPIO_NUM  // Description
+    pattern = r'#define\s+(\w+)\s+(\d+)\s*//\s*(.*)'
 
-    for key in list(raw.keys()):
-        resolve(key, set())
-    return resolved
+    for match in re.finditer(pattern, content):
+        function_name = match.group(1)
+        gpio_num = int(match.group(2))
+        description = match.group(3)
+        pin_map[function_name] = gpio_num
+
+    return pin_map
 
 
-def main() -> int:
-    doc_map = parse_doc_pins(DOC_PATH)
-    header_consts = parse_header_constants(PINS_PATH)
+def check_pinmap():
+    """Verify GPIO pin assignments in database."""
+    db = load_database()
+    gpio_pins = db.get('gpio_pins', {})
+
+    # ESP32-S3 GPIO constraints
+    VALID_GPIOS = set(range(0, 49))  # GPIO0-GPIO48
+    # GPIO35-37 unavailable with PSRAM module
+    UNAVAILABLE_WITH_PSRAM = {35, 36, 37}
+    # Strapping pins (use with caution)
+    STRAPPING_PINS = {0, 3, 45, 46}
+
+    all_pass = True
     errors = []
-    for label, const_names in CANONICAL_GROUPS.items():
-        doc_pins = doc_map.get(label)
-        if not doc_pins:
-            errors.append(f"Doc missing entry for '{label}'")
+    warnings = []
+
+    print("=" * 70)
+    print("SEDU PIN MAP VERIFICATION (Database-Driven)")
+    print("=" * 70)
+    print()
+
+    # Check 1: Validate database GPIO assignments
+    print("1. DATABASE GPIO VALIDATION")
+    print("-" * 70)
+
+    used_gpios = {}
+    for gpio_str, pin_data in sorted(gpio_pins.items(), key=lambda x: int(x[0].replace('GPIO', ''))):
+        gpio_num = int(gpio_str.replace('GPIO', ''))
+        function = pin_data['function']
+
+        # Check GPIO number is valid
+        if gpio_num not in VALID_GPIOS:
+            print(f"[FAIL] {function:20s} GPIO{gpio_num} - Invalid GPIO number")
+            errors.append(f"{function}: GPIO{gpio_num} is not valid for ESP32-S3")
+            all_pass = False
             continue
-        header_pins = [header_consts.get(name) for name in const_names]
-        if None in header_pins:
-            missing = [name for name, val in zip(const_names, header_pins) if val is None]
-            errors.append(f"pins.h missing constants: {', '.join(missing)}")
+
+        # Check GPIO not in PSRAM conflict
+        if gpio_num in UNAVAILABLE_WITH_PSRAM:
+            print(f"[FAIL] {function:20s} GPIO{gpio_num} - Unavailable (PSRAM conflict)")
+            errors.append(f"{function}: GPIO{gpio_num} unavailable with PSRAM module")
+            all_pass = False
             continue
-        if sorted(doc_pins) != sorted(header_pins):
-            errors.append(
-                f"Mismatch for '{label}': doc {doc_pins} vs pins.h {header_pins}"
-            )
-    if errors:
-        for msg in errors:
-            print(f"[pinmap] {msg}")
+
+        # Warn about strapping pins
+        if gpio_num in STRAPPING_PINS:
+            print(f"[WARN] {function:20s} GPIO{gpio_num} - Strapping pin (use with caution)")
+            warnings.append(f"{function}: GPIO{gpio_num} is a strapping pin")
+
+        # Check for conflicts (same GPIO used twice)
+        if gpio_num in used_gpios:
+            print(f"[FAIL] {function:20s} GPIO{gpio_num} - CONFLICT with {used_gpios[gpio_num]}")
+            errors.append(f"{function}: GPIO{gpio_num} already used by {used_gpios[gpio_num]}")
+            all_pass = False
+        else:
+            print(f"[OK]   {function:20s} GPIO{gpio_num}")
+            used_gpios[gpio_num] = function
+
+    print()
+    print(f"Total GPIO pins assigned: {len(used_gpios)}")
+    print()
+
+    # Check 2: Validate generated pins.h matches database
+    print("2. GENERATED PINS.H VALIDATION")
+    print("-" * 70)
+
+    pins_h_path = Path(__file__).parent.parent / "firmware" / "include" / "pins.h"
+    generated_pins = parse_generated_pins_h(pins_h_path)
+
+    if not generated_pins:
+        print("[FAIL] pins.h not found or empty - run: python scripts/generate_all.py")
+        errors.append("pins.h not generated")
+        all_pass = False
+    else:
+        # Verify each database entry appears in generated file
+        for gpio_str, pin_data in gpio_pins.items():
+            gpio_num = int(gpio_str.replace('GPIO', ''))
+            function = pin_data['function']
+
+            if function not in generated_pins:
+                print(f"[FAIL] {function:20s} - Missing in generated pins.h")
+                errors.append(f"{function}: Not found in generated pins.h")
+                all_pass = False
+            elif generated_pins[function] != gpio_num:
+                print(f"[FAIL] {function:20s} - Mismatch: DB={gpio_num}, pins.h={generated_pins[function]}")
+                errors.append(f"{function}: Database GPIO{gpio_num} != pins.h GPIO{generated_pins[function]}")
+                all_pass = False
+            else:
+                print(f"[OK]   {function:20s} = GPIO{gpio_num}")
+
+        # Check for extra pins in generated file not in database
+        db_functions = set(pin_data['function'] for pin_data in gpio_pins.values())
+        extra_functions = set(generated_pins.keys()) - db_functions
+        if extra_functions:
+            print()
+            print(f"[WARN] {len(extra_functions)} extra definitions in pins.h not in database:")
+            for func in sorted(extra_functions):
+                print(f"       - {func}")
+                warnings.append(f"pins.h contains {func} not in database")
+
+    # Summary
+    print()
+    print("=" * 70)
+    print("SUMMARY")
+    print("=" * 70)
+
+    if all_pass:
+        print("[PASS] Pin map verification complete")
+        print(f"   {len(used_gpios)} GPIO pins assigned")
+        print(f"   {len(generated_pins)} pins in generated pins.h")
+        if warnings:
+            print(f"   {len(warnings)} warning(s) (non-blocking)")
+        return 0
+    else:
+        print("[FAIL] Pin map verification failed")
+        print(f"   {len(errors)} error(s):")
+        for err in errors:
+            print(f"      - {err}")
+        if warnings:
+            print(f"   {len(warnings)} warning(s):")
+            for warn in warnings:
+                print(f"      - {warn}")
+        print()
+        print("ACTION REQUIRED:")
+        print("   1. Fix GPIO assignments in design_database.yaml")
+        print("   2. Run: python scripts/generate_all.py")
+        print("   3. Re-run: python scripts/check_pinmap.py")
         return 1
-    print("[pinmap] Canonical spec matches pins.h")
-    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(check_pinmap())

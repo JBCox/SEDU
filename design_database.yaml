@@ -1,0 +1,913 @@
+# SEDU Single-PCB Design Database - SINGLE SOURCE OF TRUTH
+# This file is the ONLY place where design values are defined.
+# All other files (BOM, docs, scripts) are GENERATED from this database.
+#
+# DO NOT edit generated files directly - edit this file and regenerate.
+
+metadata:
+  project: "SEDU Single-PCB Feed Drill"
+  revision: "C.4b"
+  frozen: true
+  board_size: "80x50"  # mm
+  mounting_holes:
+    - [4, 4]
+    - [76, 4]
+    - [4, 46]
+    - [76, 46]
+
+# ==============================================================================
+# POWER RAILS
+# ==============================================================================
+power_rails:
+  VBAT:
+    nominal: 24.0
+    min: 18.0      # 6S LiPo @ 3.0V/cell
+    max: 25.2      # 6S LiPo @ 4.2V/cell
+    description: "Battery input (6S LiPo)"
+
+  VBAT_PROT:
+    nominal: 24.0
+    description: "Protected 24V after LM5069 hot-swap"
+
+  VDD_3V3:
+    nominal: 3.3
+    tolerance: 0.033  # 1%
+    description: "Main 3.3V logic rail (LMR33630 single-stage from 24V)"
+
+  USB_5V:
+    nominal: 5.0
+    description: "USB VBUS (programming only, isolated via TPS22919)"
+
+  USB_3V3:
+    nominal: 3.3
+    description: "USB-derived 3.3V (TLV75533, programming only)"
+
+# ==============================================================================
+# ICs AND MAJOR COMPONENTS
+# ==============================================================================
+ics:
+  U1:
+    part: "ESP32-S3-WROOM-1-N16R8"
+    manufacturer: "Espressif"
+    description: "Dual-core MCU with 16MB flash, 8MB PSRAM"
+    supply_voltage: 3.3
+    datasheet: "https://docs.espressif.com/projects/esp-hardware-design-guidelines/en/latest/esp32s3/"
+    notes: "PSRAM module - GPIO35-37 unavailable"
+
+  U2:
+    part: "DRV8353RS"
+    manufacturer: "Texas Instruments"
+    description: "3-phase BLDC gate driver with integrated CSAs"
+    supply_voltage_vm: [6, 100]  # VM rail range
+    supply_voltage_dvdd: 3.3
+    datasheet: "https://www.ti.com/lit/ds/symlink/drv8353.pdf"
+    notes: "CSA gain locked to 20V/V via SPI"
+
+  U3:
+    part: "DRV8873-Q1"
+    manufacturer: "Texas Instruments"
+    description: "Automotive H-bridge motor driver (PH/EN mode)"
+    supply_voltage: [4.5, 37]
+    datasheet: "https://www.ti.com/lit/ds/symlink/drv8873.pdf"
+    notes: "Continuous 3.5A, 6.5A peak with thermal management"
+
+  U4:
+    part: "LMR33630ADDAR"
+    manufacturer: "Texas Instruments"
+    description: "Synchronous buck converter (24V->3.3V single-stage)"
+    input_voltage: [3.8, 36]
+    output_voltage: 3.3
+    output_current: 3.0
+    datasheet: "https://www.ti.com/lit/ds/symlink/lmr33630.pdf"
+    notes: "5V rail eliminated - direct 24V->3.3V conversion"
+
+  U6:
+    part: "LM5069-1"
+    manufacturer: "Texas Instruments"
+    description: "Hot-swap controller with auto-retry"
+    input_voltage: [9, 80]
+    datasheet: "https://www.ti.com/lit/ds/symlink/lm5069.pdf"
+    notes: "Type -1 = auto-retry on fault"
+
+  U7:
+    part: "TPS22919"
+    manufacturer: "Texas Instruments"
+    description: "5V 2A load switch (isolates USB rail)"
+    input_voltage: [1.62, 5.5]
+    datasheet: "https://www.ti.com/lit/ds/symlink/tps22919.pdf"
+
+  U8:
+    part: "TLV75533"
+    manufacturer: "Texas Instruments"
+    description: "500mA LDO (USB 5V -> 3.3V programming rail)"
+    input_voltage: [2.0, 5.5]
+    output_voltage: 3.3
+    output_current: 0.5
+    datasheet: "https://www.ti.com/product/TLV755P"
+
+# ==============================================================================
+# CRITICAL LOCKED COMPONENT VALUES
+# ==============================================================================
+# These values are frozen and verified by scripts
+components:
+
+  # --------------------------------------------------------------------------
+  # LM5069 Hot-Swap Components (U6)
+  # --------------------------------------------------------------------------
+  RS_IN:
+    ref: "RS_IN"
+    ic: "U6"
+    value: "3.0m"
+    tolerance: "1%"
+    power_rating: "5W"
+    package: "2728"
+    part_number: "WSLP2728L003F3A"  # 4-terminal Kelvin sense
+    notes: "Replaces CSS2H-2728R-L003F (old part not available at distributors)"
+    description: "LM5069 current sense resistor"
+    calculation: "ILIM = 55mV / 3.0mΩ = 18.3A"
+    criticality: "CRITICAL"
+    locked: true
+    datasheet_ref: "LM5069 datasheet Section 8.2.1"
+
+  RUV_TOP:
+    ref: "RUV_TOP"
+    ic: "U6"
+    value: "140k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB1403V"
+    description: "LM5069 UV divider top (sets 18V UV threshold)"
+    criticality: "CRITICAL"
+    locked: true
+
+  RUV_BOT:
+    ref: "RUV_BOT"
+    ic: "U6"
+    value: "10k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB1002V"
+    description: "LM5069 UV divider bottom"
+    criticality: "CRITICAL"
+    locked: true
+
+  ROV_TOP:
+    ref: "ROV_TOP"
+    ic: "U6"
+    value: "221k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB2213V"
+    description: "LM5069 OV divider top (sets 27V OV threshold)"
+    criticality: "CRITICAL"
+    locked: true
+
+  ROV_BOT:
+    ref: "ROV_BOT"
+    ic: "U6"
+    value: "10k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB1002V"
+    description: "LM5069 OV divider bottom"
+    criticality: "CRITICAL"
+    locked: true
+
+  RPWR:
+    ref: "RPWR"
+    ic: "U6"
+    value: "15.8k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB1582V"
+    description: "LM5069 power limit resistor"
+    criticality: "REQUIRED"
+    datasheet_ref: "LM5069 datasheet typical application"
+
+  R_PGD_PU:
+    ref: "R_PGD_PU"
+    ic: "U6"
+    value: "100k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB104V"
+    description: "LM5069 PGD pull-up (open-drain output)"
+    criticality: "RECOMMENDED"
+
+  C_LM5069_VDD:
+    ref: "C_LM5069_VDD"
+    ic: "U6"
+    value: "1uF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C105KA12"
+    description: "LM5069 VDD bypass (gate driver stability)"
+    criticality: "REQUIRED"
+    datasheet_ref: "LM5069 datasheet typical application"
+
+  CDVDT:
+    ref: "CDVDT"
+    ic: "U6"
+    value: "33nF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C333KA01"
+    description: "LM5069 dV/dt control (limits inrush)"
+    criticality: "CRITICAL"
+    locked: true
+
+  # --------------------------------------------------------------------------
+  # DRV8873 Actuator Driver Components (U3)
+  # --------------------------------------------------------------------------
+  R_ILIM:
+    ref: "R_ILIM"
+    ic: "U3"
+    value: "1.58k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB1581V"
+    description: "DRV8873 current limit setting"
+    calculation: "ILIM = 5200V / 1.58kΩ = 3.29A"
+    criticality: "CRITICAL"
+    locked: true
+    datasheet_ref: "DRV8873 datasheet Section 8.2.2.2"
+
+  R_IPROPI:
+    ref: "R_IPROPI"
+    ic: "U3"
+    value: "1.00k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB102V"
+    description: "DRV8873 IPROPI scaling"
+    calculation: "V_IPROPI = (I_LOAD / 1100) * R_IPROPI"
+    criticality: "CRITICAL"
+    locked: true
+    datasheet_ref: "DRV8873 datasheet Section 8.2.2.3"
+
+  C_DRV8873_VM1:
+    ref: "C_DRV8873_VM1"
+    ic: "U3"
+    value: "100nF"
+    voltage_rating: "50V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71H104KA93"
+    description: "DRV8873 VM bypass capacitor"
+    criticality: "CRITICAL"
+    datasheet_ref: "DRV8873 datasheet typical application (MANDATORY)"
+
+  C_DRV8873_VM2:
+    ref: "C_DRV8873_VM2"
+    ic: "U3"
+    value: "22uF"
+    voltage_rating: "35V"
+    dielectric: "X7R"
+    package: "1206"
+    part_number: "C3216X7R1V226K"
+    description: "DRV8873 VM bulk capacitor"
+    criticality: "CRITICAL"
+    datasheet_ref: "DRV8873 datasheet typical application (MANDATORY)"
+
+  C_DRV8873_DVDD:
+    ref: "C_DRV8873_DVDD"
+    ic: "U3"
+    value: "1uF"
+    voltage_rating: "6.3V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R70J105KA01"
+    description: "DRV8873 digital supply bypass"
+    criticality: "REQUIRED"
+    datasheet_ref: "DRV8873 datasheet typical application"
+
+  R_DRV8873_nFAULT:
+    ref: "R_DRV8873_nFAULT"
+    ic: "U3"
+    value: "10k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB103V"
+    description: "DRV8873 nFAULT pull-up (open-drain output)"
+    criticality: "RECOMMENDED"
+
+  # --------------------------------------------------------------------------
+  # DRV8353 Motor Driver Components (U2)
+  # --------------------------------------------------------------------------
+  C_DRV8353_VM1:
+    ref: "C_DRV8353_VM1"
+    ic: "U2"
+    value: "100nF"
+    voltage_rating: "50V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71H104KA93"
+    description: "DRV8353 VM bypass capacitor"
+    criticality: "CRITICAL"
+    datasheet_ref: "DRV8353RS datasheet Section 8.2.2 (MANDATORY)"
+
+  C_DRV8353_VM2:
+    ref: "C_DRV8353_VM2"
+    ic: "U2"
+    value: "22uF"
+    voltage_rating: "50V"
+    dielectric: "X7R"
+    package: "1206"
+    part_number: "C3216X7R1H226K"
+    description: "DRV8353 VM bulk capacitor"
+    criticality: "CRITICAL"
+    datasheet_ref: "DRV8353RS datasheet Section 8.2.2 (>=10uF MANDATORY)"
+
+  C_DRV8353_VM3:
+    ref: "C_DRV8353_VM3"
+    ic: "U2"
+    value: "22uF"
+    voltage_rating: "50V"
+    dielectric: "X7R"
+    package: "1206"
+    part_number: "C3216X7R1H226K"
+    description: "DRV8353 VM additional bulk (margin)"
+    criticality: "RECOMMENDED"
+    datasheet_ref: "DRV8353RS datasheet Section 8.2.2"
+
+  R_DRV8353_nFAULT:
+    ref: "R_DRV8353_nFAULT"
+    ic: "U2"
+    value: "10k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB103V"
+    description: "DRV8353 nFAULT pull-up (open-drain output)"
+    criticality: "RECOMMENDED"
+
+  C_CPLCPH:
+    ref: "C_CPLCPH"
+    ic: "U2"
+    value: "47nF"
+    voltage_rating: "100V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R72A473KA01"
+    description: "DRV8353 charge pump capacitor"
+    criticality: "CRITICAL"
+    locked: true
+
+  C_VCP:
+    ref: "C_VCP"
+    ic: "U2"
+    value: "1uF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C105KA12"
+    description: "DRV8353 VCP bypass"
+    criticality: "CRITICAL"
+
+  C_VGLS:
+    ref: "C_VGLS"
+    ic: "U2"
+    value: "1uF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C105KA12"
+    description: "DRV8353 VGLS bypass"
+    criticality: "CRITICAL"
+
+  C_DVDD:
+    ref: "C_DVDD"
+    ic: "U2"
+    value: "1uF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C105KA12"
+    description: "DRV8353 DVDD bypass"
+    criticality: "CRITICAL"
+
+  # --------------------------------------------------------------------------
+  # Motor Phase Current Sense Resistors
+  # --------------------------------------------------------------------------
+  RS_U:
+    ref: "RS_U"
+    ic: "U2"
+    value: "2.0m"
+    tolerance: "1%"
+    power_rating: "5W"
+    package: "2512"
+    part_number: "CSS2H-2512K-2L00F"
+    description: "Motor phase U current sense (Kelvin sense)"
+    calculation: "25A peak: P = I²R = 625*0.002 = 1.25W (5W rated, 300% margin)"
+    criticality: "CRITICAL"
+    locked: true
+    notes: "K suffix = 5W rating (R suffix = 3W, insufficient)"
+
+  RS_V:
+    ref: "RS_V"
+    ic: "U2"
+    value: "2.0m"
+    tolerance: "1%"
+    power_rating: "5W"
+    package: "2512"
+    part_number: "CSS2H-2512K-2L00F"
+    description: "Motor phase V current sense (Kelvin sense)"
+    calculation: "25A peak: P = I²R = 625*0.002 = 1.25W (5W rated, 300% margin)"
+    criticality: "CRITICAL"
+    locked: true
+
+  RS_W:
+    ref: "RS_W"
+    ic: "U2"
+    value: "2.0m"
+    tolerance: "1%"
+    power_rating: "5W"
+    package: "2512"
+    part_number: "CSS2H-2512K-2L00F"
+    description: "Motor phase W current sense (Kelvin sense)"
+    calculation: "25A peak: P = I²R = 625*0.002 = 1.25W (5W rated, 300% margin)"
+    criticality: "CRITICAL"
+    locked: true
+
+  # --------------------------------------------------------------------------
+  # ESP32-S3 Components (U1)
+  # --------------------------------------------------------------------------
+  R_CHIP_PU:
+    ref: "R_CHIP_PU"
+    ic: "U1"
+    value: "10k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB103V"
+    description: "ESP32 CHIP_PU pull-up (ensures reliable boot)"
+    criticality: "CRITICAL"
+    datasheet_ref: "Espressif Hardware Design Guidelines (MANDATORY)"
+
+  C_CHIP_PU:
+    ref: "C_CHIP_PU"
+    ic: "U1"
+    value: "1uF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C105KA12"
+    description: "ESP32 CHIP_PU RC delay (power sequencing)"
+    criticality: "CRITICAL"
+    datasheet_ref: "Espressif Hardware Design Guidelines (MANDATORY)"
+
+  C_VDD_CPU:
+    ref: "C_VDD_CPU"
+    ic: "U1"
+    value: "100nF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C104KA01"
+    description: "ESP32 VDD3P3_CPU decoupling (pin 46)"
+    criticality: "CRITICAL"
+
+  C_VDD_RTC:
+    ref: "C_VDD_RTC"
+    ic: "U1"
+    value: "100nF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C104KA01"
+    description: "ESP32 VDD3P3_RTC decoupling (pin 20)"
+    criticality: "CRITICAL"
+
+  C_VDD_SPI:
+    ref: "C_VDD_SPI"
+    ic: "U1"
+    value: "1uF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C105KA12"
+    description: "ESP32 VDD_SPI decoupling"
+    criticality: "CRITICAL"
+
+  C_VDD3P3_1:
+    ref: "C_VDD3P3_1"
+    ic: "U1"
+    value: "100nF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C104KA01"
+    description: "ESP32 VDD3P3 decoupling (pin 37)"
+    criticality: "CRITICAL"
+
+  C_VDD3P3_2:
+    ref: "C_VDD3P3_2"
+    ic: "U1"
+    value: "100nF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C104KA01"
+    description: "ESP32 VDD3P3_0 decoupling (pin 39)"
+    criticality: "CRITICAL"
+
+  C_VDD3P3_3:
+    ref: "C_VDD3P3_3"
+    ic: "U1"
+    value: "100nF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C104KA01"
+    description: "ESP32 VDD3P3 additional decoupling"
+    criticality: "RECOMMENDED"
+
+  FB_VDDA:
+    ref: "FB_VDDA"
+    ic: "U1"
+    value: "600R@100MHz"
+    package: "0603"
+    part_number: "BLM18PG601SN1D"
+    description: "ESP32 VDDA filter (improves ADC accuracy)"
+    criticality: "CRITICAL"
+
+  C_VDDA_10u:
+    ref: "C_VDDA_10u"
+    ic: "U1"
+    value: "10uF"
+    voltage_rating: "10V"
+    dielectric: "X7R"
+    package: "0805"
+    part_number: "GRM21BR71A106KA73"
+    description: "ESP32 VDDA bulk capacitor"
+    criticality: "CRITICAL"
+
+  C_VDDA_100n:
+    ref: "C_VDDA_100n"
+    ic: "U1"
+    value: "100nF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C104KA01"
+    description: "ESP32 VDDA bypass capacitor"
+    criticality: "CRITICAL"
+
+  R_USB_DP:
+    ref: "R_USB_DP"
+    ic: "U1"
+    value: "22R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-0722RL"
+    description: "USB D+ series resistor (signal integrity)"
+    criticality: "REQUIRED"
+
+  R_USB_DM:
+    ref: "R_USB_DM"
+    ic: "U1"
+    value: "22R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-0722RL"
+    description: "USB D- series resistor (signal integrity)"
+    criticality: "REQUIRED"
+
+  # --------------------------------------------------------------------------
+  # LMR33630 Buck Converter Components (U4)
+  # --------------------------------------------------------------------------
+  L4:
+    ref: "L4"
+    ic: "U4"
+    value: "10uH"
+    current_rating: "4A"
+    dcr_max: "0.05R"
+    package: "1212"
+    part_number: "SRP1265-100M"
+    description: "LMR33630 inductor (24V->3.3V)"
+    criticality: "CRITICAL"
+    locked: true
+
+  C_BOOT:
+    ref: "C_BOOT"
+    ic: "U4"
+    value: "100nF"
+    voltage_rating: "50V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71H104KA93"
+    description: "LMR33630 bootstrap capacitor"
+    criticality: "CRITICAL"
+    datasheet_ref: "LMR33630 datasheet typical application (MANDATORY)"
+
+  C_VCC:
+    ref: "C_VCC"
+    ic: "U4"
+    value: "1uF"
+    voltage_rating: "16V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C105KA12"
+    description: "LMR33630 VCC bypass"
+    criticality: "CRITICAL"
+    datasheet_ref: "LMR33630 datasheet typical application (MANDATORY)"
+
+  RFBT:
+    ref: "RFBT"
+    ic: "U4"
+    value: "100k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB104V"
+    description: "LMR33630 feedback top resistor"
+    calculation: "V_out = 0.8V * (1 + RFBT/RFBB)"
+    criticality: "CRITICAL"
+    locked: true
+
+  RFBB:
+    ref: "RFBB"
+    ic: "U4"
+    value: "43.2k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB4322V"
+    description: "LMR33630 feedback bottom resistor"
+    calculation: "For 3.3V output with 0.8V ref"
+    criticality: "CRITICAL"
+    locked: true
+
+  # --------------------------------------------------------------------------
+  # TPS22919/TLV75533 USB Isolation Components
+  # --------------------------------------------------------------------------
+  C_TPS22919_IN:
+    ref: "C_TPS22919_IN"
+    ic: "U7"
+    value: "1uF"
+    voltage_rating: "6.3V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R70J105KA01"
+    description: "TPS22919 input capacitor (VIN-GND)"
+    criticality: "REQUIRED"
+    datasheet_ref: "TPS22919 datasheet typical application"
+
+  C_TPS22919_OUT:
+    ref: "C_TPS22919_OUT"
+    ic: "U7"
+    value: "1uF"
+    voltage_rating: "6.3V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R70J105KA01"
+    description: "TPS22919 output capacitor (VOUT-GND)"
+    criticality: "REQUIRED"
+    datasheet_ref: "TPS22919 datasheet typical application"
+
+  C_TLV75533_IN:
+    ref: "C_TLV75533_IN"
+    ic: "U8"
+    value: "1uF"
+    voltage_rating: "6.3V"
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R70J105KA01"
+    description: "TLV75533 input capacitor"
+    criticality: "CRITICAL"
+    datasheet_ref: "TLV75533 datasheet (MANDATORY for stability)"
+
+  C_TLV75533_OUT:
+    ref: "C_TLV75533_OUT"
+    ic: "U8"
+    value: "10uF"
+    voltage_rating: "6.3V"
+    dielectric: "X7R"
+    package: "0805"
+    part_number: "GRM21BR70J106KE76"
+    description: "TLV75533 output capacitor"
+    criticality: "CRITICAL"
+    datasheet_ref: "TLV75533 datasheet (MANDATORY for stability)"
+
+  # --------------------------------------------------------------------------
+  # Battery Monitoring
+  # --------------------------------------------------------------------------
+  R_VBAT_TOP:
+    ref: "R_VBAT_TOP"
+    ic: "U1"
+    value: "140k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB1403V"
+    description: "Battery voltage divider top (ADC1_CH0)"
+    calculation: "25.2V max -> 1.68V at ADC (within 3.5V range)"
+    criticality: "CRITICAL"
+    locked: true
+
+  R_VBAT_BOT:
+    ref: "R_VBAT_BOT"
+    ic: "U1"
+    value: "10k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB1002V"
+    description: "Battery voltage divider bottom"
+    criticality: "CRITICAL"
+    locked: true
+
+  # --------------------------------------------------------------------------
+  # LCD Components
+  # --------------------------------------------------------------------------
+  R_SCK:
+    ref: "R_SCK"
+    ic: "J_LCD"
+    value: "22R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-0722RL"
+    description: "LCD SCK series resistor (signal integrity)"
+    criticality: "REQUIRED"
+
+  R_MOSI:
+    ref: "R_MOSI"
+    ic: "J_LCD"
+    value: "22R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-0722RL"
+    description: "LCD MOSI series resistor (signal integrity)"
+    criticality: "REQUIRED"
+
+  R_LEDK:
+    ref: "R_LEDK"
+    ic: "J_LCD"
+    value: "150R"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-07150RL"
+    description: "LCD backlight current limit"
+    calculation: "(3.3V - 1.3V) / 150Ω ≈ 13mA"
+    criticality: "CRITICAL"
+    notes: "CRITICAL: prevents LED overcurrent"
+
+# ==============================================================================
+# GPIO PIN ASSIGNMENTS (ESP32-S3)
+# ==============================================================================
+gpio_pins:
+  # Motor Control
+  GPIO38: {function: "MOTOR_HS_U", direction: "output", peripheral: "MCPWM", description: "Motor high-side U PWM"}
+  GPIO39: {function: "MOTOR_LS_U", direction: "output", peripheral: "MCPWM", description: "Motor low-side U PWM"}
+  GPIO40: {function: "MOTOR_HS_V", direction: "output", peripheral: "MCPWM", description: "Motor high-side V PWM"}
+  GPIO41: {function: "MOTOR_LS_V", direction: "output", peripheral: "MCPWM", description: "Motor low-side V PWM"}
+  GPIO42: {function: "MOTOR_HS_W", direction: "output", peripheral: "MCPWM", description: "Motor high-side W PWM"}
+  GPIO43: {function: "MOTOR_LS_W", direction: "output", peripheral: "MCPWM", description: "Motor low-side W PWM"}
+
+  # Motor Current Sense (ADC1)
+  GPIO5: {function: "CSA_U", direction: "input", peripheral: "ADC1_CH4", description: "Motor phase U current sense"}
+  GPIO6: {function: "CSA_V", direction: "input", peripheral: "ADC1_CH5", description: "Motor phase V current sense"}
+  GPIO7: {function: "CSA_W", direction: "input", peripheral: "ADC1_CH6", description: "Motor phase W current sense"}
+
+  # Hall Sensors
+  GPIO8: {function: "HALL_U", direction: "input", peripheral: "GPIO_INT", description: "Motor Hall sensor U"}
+  GPIO9: {function: "HALL_V", direction: "input", peripheral: "GPIO_INT", description: "Motor Hall sensor V"}
+  GPIO13: {function: "HALL_W", direction: "input", peripheral: "GPIO_INT", description: "Motor Hall sensor W"}
+
+  # Battery & Button Monitoring (ADC1)
+  GPIO1: {function: "V_BAT_SENSE", direction: "input", peripheral: "ADC1_CH0", description: "Battery voltage (140k/10k divider)"}
+  GPIO4: {function: "LADDER_SENSE", direction: "input", peripheral: "ADC1_CH3", description: "Button ladder voltage"}
+
+  # Actuator Control
+  GPIO30: {function: "ACT_PH", direction: "output", peripheral: "GPIO", description: "DRV8873 phase input"}
+  GPIO31: {function: "ACT_EN", direction: "output", peripheral: "GPIO", description: "DRV8873 enable (PWM)"}
+  GPIO2: {function: "ACT_IPROPI", direction: "input", peripheral: "ADC1_CH1", description: "DRV8873 current feedback"}
+
+  # Start/Stop Discrete Inputs
+  GPIO23: {function: "BTN_START", direction: "input", peripheral: "GPIO", description: "Start button (discrete, redundant)"}
+  GPIO24: {function: "BTN_STOP", direction: "input", peripheral: "GPIO", description: "Stop button (discrete, NC, redundant)"}
+
+  # DRV8353 SPI
+  GPIO22: {function: "DRV_CS", direction: "output", peripheral: "SPI", description: "DRV8353 SPI chip select"}
+  GPIO18: {function: "DRV_SCK", direction: "output", peripheral: "SPI", description: "DRV8353 SPI clock"}
+  GPIO17: {function: "DRV_MOSI", direction: "output", peripheral: "SPI", description: "DRV8353 SPI MOSI"}
+  GPIO21: {function: "DRV_MISO", direction: "input", peripheral: "SPI", description: "DRV8353 SPI MISO"}
+
+  # LCD SPI (shares SCK/MOSI)
+  GPIO16: {function: "LCD_CS", direction: "output", peripheral: "SPI", description: "LCD chip select"}
+  GPIO32: {function: "LCD_DC", direction: "output", peripheral: "GPIO", description: "LCD data/command"}
+  GPIO33: {function: "LCD_RST", direction: "output", peripheral: "GPIO", description: "LCD reset"}
+  GPIO34: {function: "LCD_BL", direction: "output", peripheral: "PWM", description: "LCD backlight PWM"}
+
+  # USB (Native OTG)
+  GPIO19: {function: "USB_DM", direction: "bidir", peripheral: "USB_OTG", description: "USB D- (22Ω series)"}
+  GPIO20: {function: "USB_DP", direction: "bidir", peripheral: "USB_OTG", description: "USB D+ (22Ω series)"}
+
+  # Fault Monitoring
+  GPIO11: {function: "DRV8353_nFAULT", direction: "input", peripheral: "GPIO_INT", description: "DRV8353 fault (open-drain, 10k pullup)"}
+  GPIO12: {function: "DRV8873_nFAULT", direction: "input", peripheral: "GPIO_INT", description: "DRV8873 fault (open-drain, 10k pullup)"}
+  GPIO14: {function: "LM5069_PGD", direction: "input", peripheral: "GPIO_INT", description: "LM5069 power good (open-drain, 100k pullup)"}
+
+  # User Feedback
+  GPIO15: {function: "BUZZER", direction: "output", peripheral: "GPIO", description: "Buzzer output"}
+  GPIO3: {function: "LED_STATUS", direction: "output", peripheral: "GPIO", description: "Status LED"}
+
+  # Temperature Monitoring (Future)
+  GPIO10: {function: "NTC_TEMP", direction: "input", peripheral: "ADC1_CH9", description: "NTC temperature sensor (future)"}
+
+# ==============================================================================
+# FIRMWARE CONSTANTS
+# ==============================================================================
+firmware_constants:
+  # Battery monitoring
+  VBAT_DIVIDER_TOP: 140000  # 140kΩ
+  VBAT_DIVIDER_BOT: 10000   # 10kΩ
+  VBAT_MIN: 18.0            # 6S @ 3.0V/cell
+  VBAT_MAX: 25.2            # 6S @ 4.2V/cell
+  VBAT_UV_THRESHOLD: 19.5   # 6S @ 3.25V/cell
+
+  # Hall sensor
+  HALL_EDGES_PER_REV: 24.0  # 8-pole motor = 4 pole pairs × 6 electrical states
+
+  # DRV8353 CSA
+  CSA_GAIN: 20.0            # V/V (configured via SPI)
+  PHASE_SHUNT_R: 0.002      # 2mΩ
+
+  # DRV8873 actuator
+  ILIM_RESISTOR: 1580       # 1.58kΩ
+  ILIM_CURRENT: 3.29        # A (calculated)
+  IPROPI_RESISTOR: 1000     # 1.0kΩ
+
+  # Safety timers
+  ACTUATOR_TIMEOUT_MS: 10000   # 10s max continuous runtime
+  WATCHDOG_TIMEOUT_MS: 5000    # 5s task watchdog
+  FAULT_DEBOUNCE_MS: 300       # 300ms debounce for ladder faults
+
+  # ADC configuration
+  ADC_ATTENUATION: 12       # dB (3.5V full scale)
+  ADC_REFERENCE_MV: 3300    # 3.3V
+
+# ==============================================================================
+# VERIFICATION RULES
+# ==============================================================================
+verification_rules:
+  power_derating:
+    voltage: 0.80   # 80% of absolute max (20% margin)
+    current: 0.80   # 80% of continuous rating
+    power: 0.50     # 50% of rated power
+    thermal: 0.85   # Tj < 85% of max
+
+  locked_values:
+    - component: "RS_IN"
+      value: "3.0m"
+      reason: "LM5069 ILIM calculation"
+    - component: "R_ILIM"
+      value: "1.58k"
+      reason: "DRV8873 current limit"
+    - component: "R_IPROPI"
+      value: "1.00k"
+      reason: "DRV8873 IPROPI scaling"
+    - component: "R_VBAT_TOP"
+      value: "140k"
+      reason: "Battery divider calculation"
+    - component: "R_VBAT_BOT"
+      value: "10k"
+      reason: "Battery divider calculation"
+    - component: "RS_U"
+      value: "2.0m"
+      reason: "Motor CSA calculation"
+    - component: "RS_V"
+      value: "2.0m"
+      reason: "Motor CSA calculation"
+    - component: "RS_W"
+      value: "2.0m"
+      reason: "Motor CSA calculation"
+    - component: "RFBT"
+      value: "100k"
+      reason: "LMR33630 3.3V output"
+    - component: "RFBB"
+      value: "43.2k"
+      reason: "LMR33630 3.3V output"
+
+  board_geometry:
+    width_mm: 80
+    height_mm: 50
+    tolerance_mm: 0.1
+    mounting_holes: 4
+    hole_diameter_mm: 3.2  # M3 clearance
