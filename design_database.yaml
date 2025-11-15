@@ -1800,17 +1800,21 @@ ic_required_components:
       - RS_V
       - RS_W
       - C_DVDD
-      - C_VM
-      - C_CPH
-      - C_CPL
+      - C_DRV8353_VM1
+      - C_DRV8353_VM2
+      - C_DRV8353_VM3
+      - C_CPLCPH
+      - C_VCP
+      - C_VGLS
     description: "DRV8353RS 3-phase bridge and support components"
 
   U3:  # DRV8873-Q1
     required:
       - R_ILIM
       - R_IPROPI
-      - C_VM_ACT
-      - C_VCP
+      - C_DRV8873_VM1
+      - C_DRV8873_VM2
+      - C_DRV8873_DVDD
     description: "DRV8873 H-bridge support components"
 
   U4:  # LMR33630
@@ -1837,8 +1841,8 @@ ic_required_components:
       - ROV_TOP
       - ROV_BOT
       - RPWR
-      - CDVDT_LM
-      - C_GATE
+      - CDVDT
+      - C_LM5069_VDD
       - Q_HS
       - TVS1
       - NT_PGND_LGND
