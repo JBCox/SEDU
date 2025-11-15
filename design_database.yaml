@@ -768,6 +768,810 @@ components:
     criticality: "CRITICAL"
     notes: "CRITICAL: prevents LED overcurrent"
 
+  # --------------------------------------------------------------------------
+  # Motor Bridge MOSFETs (U2 - DRV8353RS)
+  # --------------------------------------------------------------------------
+  Q1:
+    ref: "Q1"
+    ic: "U2"
+    type: "N-MOSFET"
+    value: "BSC016N06NS"
+    voltage_rating: 60
+    current_rating: 100
+    rds_on_max: "2mOhm"
+    package: "SuperSO8"
+    part_number: "BSC016N06NS"
+    manufacturer: "Infineon"
+    description: "Motor bridge high-side U MOSFET"
+    criticality: "CRITICAL"
+    notes: "60V 100A SuperSO8, typical RDS(on) 1.6mΩ @ 10V VGS"
+
+  Q2:
+    ref: "Q2"
+    ic: "U2"
+    type: "N-MOSFET"
+    value: "BSC016N06NS"
+    voltage_rating: 60
+    current_rating: 100
+    rds_on_max: "2mOhm"
+    package: "SuperSO8"
+    part_number: "BSC016N06NS"
+    manufacturer: "Infineon"
+    description: "Motor bridge low-side U MOSFET"
+    criticality: "CRITICAL"
+
+  Q3:
+    ref: "Q3"
+    ic: "U2"
+    type: "N-MOSFET"
+    value: "BSC016N06NS"
+    voltage_rating: 60
+    current_rating: 100
+    rds_on_max: "2mOhm"
+    package: "SuperSO8"
+    part_number: "BSC016N06NS"
+    manufacturer: "Infineon"
+    description: "Motor bridge high-side V MOSFET"
+    criticality: "CRITICAL"
+
+  Q4:
+    ref: "Q4"
+    ic: "U2"
+    type: "N-MOSFET"
+    value: "BSC016N06NS"
+    voltage_rating: 60
+    current_rating: 100
+    rds_on_max: "2mOhm"
+    package: "SuperSO8"
+    part_number: "BSC016N06NS"
+    manufacturer: "Infineon"
+    description: "Motor bridge low-side V MOSFET"
+    criticality: "CRITICAL"
+
+  Q5:
+    ref: "Q5"
+    ic: "U2"
+    type: "N-MOSFET"
+    value: "BSC016N06NS"
+    voltage_rating: 60
+    current_rating: 100
+    rds_on_max: "2mOhm"
+    package: "SuperSO8"
+    part_number: "BSC016N06NS"
+    manufacturer: "Infineon"
+    description: "Motor bridge high-side W MOSFET"
+    criticality: "CRITICAL"
+
+  Q6:
+    ref: "Q6"
+    ic: "U2"
+    type: "N-MOSFET"
+    value: "BSC016N06NS"
+    voltage_rating: 60
+    current_rating: 100
+    rds_on_max: "2mOhm"
+    package: "SuperSO8"
+    part_number: "BSC016N06NS"
+    manufacturer: "Infineon"
+    description: "Motor bridge low-side W MOSFET"
+    criticality: "CRITICAL"
+
+  # --------------------------------------------------------------------------
+  # Motor MOSFET Gate Resistors (U2 - DRV8353RS)
+  # --------------------------------------------------------------------------
+  RG_U_HS:
+    ref: "RG_U_HS"
+    ic: "U2"
+    value: "10R"
+    tolerance: "5%"
+    power_rating: "0.125W"
+    package: "0603"
+    part_number: "RC0603FR-0710RL"
+    description: "Gate resistor high-side U"
+    criticality: "REQUIRED"
+    notes: "Place at MOSFET gate, ±2mm matching requirement"
+
+  RG_U_LS:
+    ref: "RG_U_LS"
+    ic: "U2"
+    value: "10R"
+    tolerance: "5%"
+    power_rating: "0.125W"
+    package: "0603"
+    part_number: "RC0603FR-0710RL"
+    description: "Gate resistor low-side U"
+    criticality: "REQUIRED"
+
+  RG_V_HS:
+    ref: "RG_V_HS"
+    ic: "U2"
+    value: "10R"
+    tolerance: "5%"
+    power_rating: "0.125W"
+    package: "0603"
+    part_number: "RC0603FR-0710RL"
+    description: "Gate resistor high-side V"
+    criticality: "REQUIRED"
+
+  RG_V_LS:
+    ref: "RG_V_LS"
+    ic: "U2"
+    value: "10R"
+    tolerance: "5%"
+    power_rating: "0.125W"
+    package: "0603"
+    part_number: "RC0603FR-0710RL"
+    description: "Gate resistor low-side V"
+    criticality: "REQUIRED"
+
+  RG_W_HS:
+    ref: "RG_W_HS"
+    ic: "U2"
+    value: "10R"
+    tolerance: "5%"
+    power_rating: "0.125W"
+    package: "0603"
+    part_number: "RC0603FR-0710RL"
+    description: "Gate resistor high-side W"
+    criticality: "REQUIRED"
+
+  RG_W_LS:
+    ref: "RG_W_LS"
+    ic: "U2"
+    value: "10R"
+    tolerance: "5%"
+    power_rating: "0.125W"
+    package: "0603"
+    part_number: "RC0603FR-0710RL"
+    description: "Gate resistor low-side W"
+    criticality: "REQUIRED"
+
+  # --------------------------------------------------------------------------
+  # ADC Anti-Aliasing Components (U1 - ESP32-S3 ADC inputs)
+  # --------------------------------------------------------------------------
+  R_CSA_U:
+    ref: "R_CSA_U"
+    ic: "U1"
+    value: "56R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-0756RL"
+    description: "CSA U series resistor (GPIO5 anti-alias)"
+    criticality: "REQUIRED"
+    notes: "Series at GPIO5 ADC input, forms RC filter with C_CSA_U"
+
+  C_CSA_U:
+    ref: "C_CSA_U"
+    ic: "U1"
+    value: "470pF"
+    voltage_rating: 50
+    dielectric: "C0G"
+    package: "0603"
+    part_number: "GRM1885C1H471JA01"
+    description: "CSA U shunt capacitor (GPIO5 anti-alias)"
+    criticality: "REQUIRED"
+    notes: "Shunt to GND at GPIO5"
+
+  R_CSA_V:
+    ref: "R_CSA_V"
+    ic: "U1"
+    value: "56R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-0756RL"
+    description: "CSA V series resistor (GPIO6 anti-alias)"
+    criticality: "REQUIRED"
+
+  C_CSA_V:
+    ref: "C_CSA_V"
+    ic: "U1"
+    value: "470pF"
+    voltage_rating: 50
+    dielectric: "C0G"
+    package: "0603"
+    part_number: "GRM1885C1H471JA01"
+    description: "CSA V shunt capacitor (GPIO6 anti-alias)"
+    criticality: "REQUIRED"
+
+  R_CSA_W:
+    ref: "R_CSA_W"
+    ic: "U1"
+    value: "56R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-0756RL"
+    description: "CSA W series resistor (GPIO7 anti-alias)"
+    criticality: "REQUIRED"
+
+  C_CSA_W:
+    ref: "C_CSA_W"
+    ic: "U1"
+    value: "470pF"
+    voltage_rating: 50
+    dielectric: "C0G"
+    package: "0603"
+    part_number: "GRM1885C1H471JA01"
+    description: "CSA W shunt capacitor (GPIO7 anti-alias)"
+    criticality: "REQUIRED"
+
+  R_BAT_SER:
+    ref: "R_BAT_SER"
+    ic: "U1"
+    value: "1k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB102V"
+    description: "Battery ADC series resistor (GPIO1 protection)"
+    criticality: "REQUIRED"
+    notes: "Series at GPIO1 ADC1_CH0, forms RC filter with C_BAT_AA"
+
+  C_BAT_AA:
+    ref: "C_BAT_AA"
+    ic: "U1"
+    value: "100nF"
+    voltage_rating: 16
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C104KA01"
+    description: "Battery ADC anti-alias capacitor (GPIO1)"
+    criticality: "REQUIRED"
+    notes: "Shunt to GND at GPIO1"
+
+  R_IPROPI_SER:
+    ref: "R_IPROPI_SER"
+    ic: "U1"
+    value: "100R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-07100RL"
+    description: "IPROPI series resistor (GPIO2 protection)"
+    criticality: "REQUIRED"
+    notes: "Series at GPIO2 ADC1_CH1"
+
+  C_IPROPI_AA:
+    ref: "C_IPROPI_AA"
+    ic: "U1"
+    value: "10nF"
+    voltage_rating: 16
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C103KA01"
+    description: "IPROPI anti-alias capacitor (GPIO2)"
+    criticality: "REQUIRED"
+    notes: "Shunt to GND at GPIO2"
+
+  R_BTN_SER:
+    ref: "R_BTN_SER"
+    ic: "U1"
+    value: "100R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-07100RL"
+    description: "Button ladder series resistor (GPIO4 protection)"
+    criticality: "REQUIRED"
+    notes: "Series at GPIO4 ADC1_CH3, between ladder and MCU"
+
+  # --------------------------------------------------------------------------
+  # Button Ladder Components
+  # --------------------------------------------------------------------------
+  R19:
+    ref: "R19"
+    ic: "J_UI"
+    value: "10k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB103V"
+    manufacturer: "Panasonic"
+    description: "Button ladder pull-up resistor"
+    criticality: "REQUIRED"
+    notes: "Main 3.3V pull-up for ladder network"
+
+  R20:
+    ref: "R20"
+    ic: "J_UI"
+    value: "100k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB104V"
+    manufacturer: "Panasonic"
+    description: "Button ladder auxiliary pull-up"
+    criticality: "REQUIRED"
+
+  R21:
+    ref: "R21"
+    ic: "J_UI"
+    value: "5.1k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB512V"
+    manufacturer: "Panasonic"
+    description: "Start button leg (Normally Open)"
+    criticality: "REQUIRED"
+
+  R11:
+    ref: "R11"
+    ic: "J_UI"
+    value: "10k"
+    tolerance: "1%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "ERA-3AEB103V"
+    manufacturer: "Panasonic"
+    description: "Stop button leg (Normally Closed)"
+    criticality: "REQUIRED"
+    notes: "NC button, critical for safety"
+
+  C19:
+    ref: "C19"
+    ic: "J_UI"
+    value: "100nF"
+    voltage_rating: 16
+    dielectric: "X7R"
+    package: "0603"
+    part_number: "GRM188R71C104KA01"
+    description: "Button ladder RC filter capacitor"
+    criticality: "REQUIRED"
+    notes: "Debouncing cap at ladder node"
+
+  R_START_SER:
+    ref: "R_START_SER"
+    ic: "J_UI"
+    value: "100R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-07100RL"
+    description: "Start digital input series resistor"
+    criticality: "REQUIRED"
+    notes: "Series at GPIO23 protection near J_UI"
+
+  R_STOP_SER:
+    ref: "R_STOP_SER"
+    ic: "J_UI"
+    value: "100R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-07100RL"
+    description: "Stop digital input series resistor"
+    criticality: "REQUIRED"
+    notes: "Series at GPIO24 protection near J_UI"
+
+  # --------------------------------------------------------------------------
+  # USB-C Interface Components
+  # --------------------------------------------------------------------------
+  R_CC1:
+    ref: "R_CC1"
+    ic: "J_USB"
+    value: "5.1k"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-075K1L"
+    description: "USB-C CC1 pulldown resistor"
+    criticality: "REQUIRED"
+    notes: "UFP CC1 pulldown to GND, identifies as USB device"
+
+  R_CC2:
+    ref: "R_CC2"
+    ic: "J_USB"
+    value: "5.1k"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-075K1L"
+    description: "USB-C CC2 pulldown resistor"
+    criticality: "REQUIRED"
+    notes: "UFP CC2 pulldown to GND"
+
+  # --------------------------------------------------------------------------
+  # Protection Devices
+  # --------------------------------------------------------------------------
+  TVS1:
+    ref: "TVS1"
+    ic: "U6"
+    type: "TVS Diode"
+    value: "SMBJ33A"
+    voltage_rating: 33
+    package: "DO-214AA"
+    part_number: "SMBJ33A"
+    description: "Battery input surge clamp"
+    criticality: "CRITICAL"
+    notes: "33V standoff, typical clamp 53.3V @ 1A"
+
+  TVS2:
+    ref: "TVS2"
+    ic: "U3"
+    type: "TVS Diode"
+    value: "SMBJ33A"
+    voltage_rating: 33
+    package: "DO-214AA"
+    part_number: "SMBJ33A"
+    description: "Actuator supply surge clamp"
+    criticality: "REQUIRED"
+
+  ESDUSB:
+    ref: "ESDUSB"
+    ic: "U1"
+    type: "ESD Array"
+    value: "USBLC6-2SC6"
+    package: "SOT-23-6"
+    part_number: "USBLC6-2SC6"
+    manufacturer: "STMicroelectronics"
+    description: "USB D+/D- ESD protection array"
+    criticality: "REQUIRED"
+    notes: "2-line ESD near USB-C connector, protects GPIO19/20"
+
+  ESD_UI:
+    ref: "ESD_UI"
+    ic: "J_UI"
+    type: "ESD Array"
+    value: "4-line TVS array"
+    package: "Array"
+    part_number: "TBD"
+    description: "UI connector ESD protection (4-line)"
+    criticality: "RECOMMENDED"
+    notes: "Protects GPIO23/24 near J_UI, short GND return"
+
+  ESD_CC:
+    ref: "ESD_CC"
+    ic: "J_USB"
+    type: "ESD Array"
+    value: "2-line ESD array"
+    package: "SOT-23"
+    part_number: "TBD"
+    description: "USB-C CC line ESD protection (DNI)"
+    criticality: "OPTIONAL"
+    notes: "CC1/CC2 ESD near USB-C connector, DNI unless required"
+
+  # --------------------------------------------------------------------------
+  # Power Input Protection (U6 Circuit)
+  # --------------------------------------------------------------------------
+  QREV:
+    ref: "QREV"
+    ic: "U6"
+    type: "P-MOSFET"
+    value: "P-FET 60V"
+    voltage_rating: 60
+    current_rating: 20
+    rds_on_max: "10mOhm"
+    package: "PowerPAK"
+    part_number: "TBD"
+    description: "Reverse input protection MOSFET (optional)"
+    criticality: "OPTIONAL"
+    notes: "Optional reverse polarity protection, alternative to diode"
+
+  Q_HS:
+    ref: "Q_HS"
+    ic: "U6"
+    type: "N-MOSFET"
+    value: "BSC040N08NS5"
+    voltage_rating: 60
+    current_rating: 40
+    rds_on_max: "4mOhm"
+    package: "SuperSO8"
+    part_number: "BSC040N08NS5"
+    manufacturer: "Infineon"
+    description: "LM5069 hot-swap pass FET"
+    criticality: "CRITICAL"
+    notes: "Hot-swap pass element, controlled by LM5069 GATE pin"
+
+  # --------------------------------------------------------------------------
+  # LMR33630 Buck Converter Capacitors (U4)
+  # --------------------------------------------------------------------------
+  C4IN:
+    ref: "C4IN"
+    ic: "U4"
+    value: "10uF"
+    voltage_rating: 50
+    dielectric: "X7R"
+    package: "1206"
+    part_number: "GRM31CR71H106KA12"
+    manufacturer: "Murata"
+    description: "LMR33630 input capacitor (10uF primary)"
+    criticality: "CRITICAL"
+    notes: "Parallel with 220nF ceramic for input decoupling"
+
+  C4_1:
+    ref: "C4_1"
+    ic: "U4"
+    value: "22uF"
+    voltage_rating: 10
+    dielectric: "X7R"
+    package: "0805"
+    part_number: "GRM21BR71A226ME44"
+    manufacturer: "Murata"
+    description: "LMR33630 output capacitor 1 of 4"
+    criticality: "CRITICAL"
+    notes: "3.3V output, 4× parallel for low ESR"
+
+  C4_2:
+    ref: "C4_2"
+    ic: "U4"
+    value: "22uF"
+    voltage_rating: 10
+    dielectric: "X7R"
+    package: "0805"
+    part_number: "GRM21BR71A226ME44"
+    manufacturer: "Murata"
+    description: "LMR33630 output capacitor 2 of 4"
+    criticality: "CRITICAL"
+
+  C4_3:
+    ref: "C4_3"
+    ic: "U4"
+    value: "22uF"
+    voltage_rating: 10
+    dielectric: "X7R"
+    package: "0805"
+    part_number: "GRM21BR71A226ME44"
+    manufacturer: "Murata"
+    description: "LMR33630 output capacitor 3 of 4"
+    criticality: "CRITICAL"
+
+  C4_4:
+    ref: "C4_4"
+    ic: "U4"
+    value: "22uF"
+    voltage_rating: 10
+    dielectric: "X7R"
+    package: "0805"
+    part_number: "GRM21BR71A226ME44"
+    manufacturer: "Murata"
+    description: "LMR33630 output capacitor 4 of 4"
+    criticality: "CRITICAL"
+
+  # --------------------------------------------------------------------------
+  # Motor Phase RC Snubbers (DNI - Do Not Install)
+  # --------------------------------------------------------------------------
+  RSN_U:
+    ref: "RSN_U"
+    ic: "U2"
+    value: "10R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-0710RL"
+    description: "Phase U RC snubber resistor (DNI)"
+    criticality: "OPTIONAL"
+    notes: "DNI unless EMI issues observed, U→PGND snubber series"
+
+  CSN_U:
+    ref: "CSN_U"
+    ic: "U2"
+    value: "4.7nF"
+    voltage_rating: 50
+    dielectric: "C0G"
+    package: "0603"
+    part_number: "GRM1885C1H472JA01"
+    description: "Phase U RC snubber capacitor (DNI)"
+    criticality: "OPTIONAL"
+    notes: "DNI unless EMI issues observed"
+
+  RSN_V:
+    ref: "RSN_V"
+    ic: "U2"
+    value: "10R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-0710RL"
+    description: "Phase V RC snubber resistor (DNI)"
+    criticality: "OPTIONAL"
+
+  CSN_V:
+    ref: "CSN_V"
+    ic: "U2"
+    value: "4.7nF"
+    voltage_rating: 50
+    dielectric: "C0G"
+    package: "0603"
+    part_number: "GRM1885C1H472JA01"
+    description: "Phase V RC snubber capacitor (DNI)"
+    criticality: "OPTIONAL"
+
+  RSN_W:
+    ref: "RSN_W"
+    ic: "U2"
+    value: "10R"
+    tolerance: "5%"
+    power_rating: "0.1W"
+    package: "0603"
+    part_number: "RC0603FR-0710RL"
+    description: "Phase W RC snubber resistor (DNI)"
+    criticality: "OPTIONAL"
+
+  CSN_W:
+    ref: "CSN_W"
+    ic: "U2"
+    value: "4.7nF"
+    voltage_rating: 50
+    dielectric: "C0G"
+    package: "0603"
+    part_number: "GRM1885C1H472JA01"
+    description: "Phase W RC snubber capacitor (DNI)"
+    criticality: "OPTIONAL"
+
+  # --------------------------------------------------------------------------
+  # Connectors
+  # --------------------------------------------------------------------------
+  J_BAT:
+    ref: "J_BAT"
+    ic: "Power_In"
+    type: "Connector"
+    value: "MicroFit 3.0 2-pos"
+    package: "MicroFit_3.0_1x02_P3.00mm_Vertical"
+    part_number: "43045-0200"
+    manufacturer: "Molex"
+    description: "Battery input connector"
+    criticality: "CRITICAL"
+    notes: "Requires 14 AWG wire minimum for 23A peak, crimp terminals 43030-0001"
+
+  J_MOT:
+    ref: "J_MOT"
+    ic: "U2"
+    type: "Connector"
+    value: "MicroFit 3.0 3-pos"
+    package: "MicroFit_3.0_1x03_P3.00mm_Vertical"
+    part_number: "43045-0300"
+    manufacturer: "Molex"
+    description: "Motor 3-phase connector (U/V/W)"
+    criticality: "CRITICAL"
+    notes: "14 AWG per phase for 20A peak"
+
+  J_ACT:
+    ref: "J_ACT"
+    ic: "U3"
+    type: "Connector"
+    value: "MicroFit 3.0 2-pos"
+    package: "MicroFit_3.0_1x02_P3.00mm_Vertical"
+    part_number: "43045-0200"
+    manufacturer: "Molex"
+    description: "Actuator connector"
+    criticality: "CRITICAL"
+    notes: "18 AWG minimum for 3.3A continuous"
+
+  J_LCD:
+    ref: "J_LCD"
+    ic: "Display"
+    type: "Connector"
+    value: "JST-GH 8-pos"
+    package: "JST_GH_BM08B-GHS-TBT_1x08-1MP_P1.25mm_Vertical"
+    part_number: "BM08B-GHS-TBT"
+    manufacturer: "JST"
+    description: "LCD daughterboard connector"
+    criticality: "REQUIRED"
+    notes: "Pinout: 3V3, GND, SCK, MOSI, CS_LCD, DC, RST, LEDK"
+
+  J_UI:
+    ref: "J_UI"
+    ic: "UI_Board"
+    type: "Connector"
+    value: "JST-GH 8-pos"
+    package: "JST_GH_BM08B-GHS-TBT_1x08-1MP_P1.25mm_Vertical"
+    part_number: "BM08B-GHS-TBT"
+    manufacturer: "JST"
+    description: "UI daughterboard connector"
+    criticality: "REQUIRED"
+    notes: "Pinout: 3V3, GND, BTN_SENSE, START, STOP, BUZZER, LED1, LED2"
+
+  # --------------------------------------------------------------------------
+  # Miscellaneous Components
+  # --------------------------------------------------------------------------
+  Q_LED:
+    ref: "Q_LED"
+    ic: "J_LCD"
+    type: "N-MOSFET"
+    value: "N-FET SOT-23"
+    voltage_rating: 30
+    current_rating: 0.2
+    package: "SOT-23"
+    part_number: "2N7002"
+    description: "LCD backlight sink FET"
+    criticality: "OPTIONAL"
+    notes: "Alternative to resistor-only backlight limit, PWM capable"
+
+  FB_LED:
+    ref: "FB_LED"
+    ic: "J_LCD"
+    type: "Ferrite Bead"
+    value: "600ohm@100MHz"
+    package: "0603"
+    part_number: "BLM18PG601SN1D"
+    manufacturer: "Murata"
+    description: "LCD backlight ferrite bead (DNI)"
+    criticality: "OPTIONAL"
+    notes: "LEDK series bead, DNI unless EMI issues"
+
+  NT_PGND_LGND:
+    ref: "NT_PGND_LGND"
+    ic: "U6"
+    type: "Net Tie"
+    value: "0ohm trace"
+    package: "NetTie_2"
+    part_number: "NetTie"
+    description: "Power/logic ground star point tie"
+    criticality: "CRITICAL"
+    notes: "Star ground near LM5069 Kelvin sense, joins PGND and LGND"
+
+  # --------------------------------------------------------------------------
+  # Test Points
+  # --------------------------------------------------------------------------
+  TP_3V3:
+    ref: "TP_3V3"
+    ic: "Test"
+    type: "Test Point"
+    value: "Keystone 5000"
+    package: "TestPoint"
+    part_number: "5000"
+    manufacturer: "Keystone"
+    description: "3.3V rail test point"
+    criticality: "RECOMMENDED"
+
+  TP_24V:
+    ref: "TP_24V"
+    ic: "Test"
+    type: "Test Point"
+    value: "Keystone 5000"
+    package: "TestPoint"
+    part_number: "5000"
+    manufacturer: "Keystone"
+    description: "Protected 24V rail test point (VBAT_PROT)"
+    criticality: "RECOMMENDED"
+
+  TP_BTN:
+    ref: "TP_BTN"
+    ic: "Test"
+    type: "Test Point"
+    value: "Keystone 5000"
+    package: "TestPoint"
+    part_number: "5000"
+    manufacturer: "Keystone"
+    description: "Button sense voltage test point"
+    criticality: "RECOMMENDED"
+
+  TP_IPROPI:
+    ref: "TP_IPROPI"
+    ic: "Test"
+    type: "Test Point"
+    value: "Keystone 5000"
+    package: "TestPoint"
+    part_number: "5000"
+    manufacturer: "Keystone"
+    description: "Actuator IPROPI test point"
+    criticality: "RECOMMENDED"
+
+  TP_RX:
+    ref: "TP_RX"
+    ic: "Test"
+    type: "Test Point"
+    value: "Keystone 5000"
+    package: "TestPoint"
+    part_number: "5000"
+    manufacturer: "Keystone"
+    description: "UART RX debug test point"
+    criticality: "RECOMMENDED"
+
+  TP_TX:
+    ref: "TP_TX"
+    ic: "Test"
+    type: "Test Point"
+    value: "Keystone 5000"
+    package: "TestPoint"
+    part_number: "5000"
+    manufacturer: "Keystone"
+    description: "UART TX debug test point"
+    criticality: "RECOMMENDED"
+
 # ==============================================================================
 # GPIO PIN ASSIGNMENTS (ESP32-S3)
 # ==============================================================================
@@ -911,3 +1715,154 @@ verification_rules:
     tolerance_mm: 0.1
     mounting_holes: 4
     hole_diameter_mm: 3.2  # M3 clearance
+
+# ==============================================================================
+# BUTTON LADDER VOLTAGE BANDS
+# ==============================================================================
+button_ladder:
+  pull_up: 10000      # R19: 10kΩ to 3.3V
+  aux_pull_up: 100000 # R20: 100kΩ auxiliary
+  bands:
+    IDLE:
+      voltage_min: 3.20
+      voltage_max: 3.35
+      description: "No button pressed (pull-up voltage)"
+    START:
+      voltage_min: 1.50
+      voltage_max: 1.70
+      description: "Start button (R21 = 5.1kΩ)"
+    STOP:
+      voltage_min: 2.80
+      voltage_max: 3.00
+      description: "Stop button NC (R11 = 10kΩ)"
+    F1:
+      voltage_min: 0.80
+      voltage_max: 1.00
+      description: "Function 1 button"
+    F2:
+      voltage_min: 0.40
+      voltage_max: 0.60
+      description: "Function 2 button"
+    F3:
+      voltage_min: 0.10
+      voltage_max: 0.30
+      description: "Function 3 button"
+    FAULT:
+      voltage_min: 0.00
+      voltage_max: 0.05
+      description: "Ladder short or fault"
+
+# ==============================================================================
+# BANNED COMPONENTS (5V Rail Elimination)
+# ==============================================================================
+banned_components:
+  - ref: "OLD_5V_BUCK"
+    reason: "5V buck eliminated (was TPS62133), single-stage LMR33630ADDAR used instead"
+  - ref: "L5"
+    reason: "5V buck inductor eliminated with rail removal"
+  - ref: "U5"
+    reason: "Eliminated with 5V rail removal"
+  - ref: "C5_1"
+    reason: "5V output capacitor eliminated with rail removal"
+  - ref: "C5_2"
+    reason: "5V output capacitor eliminated with rail removal"
+
+banned_nets:
+  - name: "5V"
+    reason: "5V rail eliminated"
+  - name: "SW_5V"
+    reason: "5V switching node eliminated"
+  - name: "FB_5V"
+    reason: "5V feedback eliminated"
+  - name: "TP_5V"
+    reason: "5V test point eliminated"
+
+# ==============================================================================
+# IC REQUIRED COMPONENTS (BOM Completeness)
+# ==============================================================================
+# This section extends the 'ics' definitions with required component dependencies
+ic_required_components:
+  U1:  # ESP32-S3-WROOM-1-N16R8
+    required:
+      - R_VBAT_TOP
+      - R_VBAT_BOT
+      - C_VDD_CPU
+      - C_VDD_RTC
+      - C_VDD_SPI
+      - R_USB_DP
+      - R_USB_DM
+    description: "ESP32-S3 decoupling and interface components"
+
+  U2:  # DRV8353RS
+    required:
+      - Q1
+      - Q2
+      - Q3
+      - Q4
+      - Q5
+      - Q6
+      - RG_U_HS
+      - RG_U_LS
+      - RG_V_HS
+      - RG_V_LS
+      - RG_W_HS
+      - RG_W_LS
+      - RS_U
+      - RS_V
+      - RS_W
+      - C_DVDD
+      - C_VM
+      - C_CPH
+      - C_CPL
+    description: "DRV8353RS 3-phase bridge and support components"
+
+  U3:  # DRV8873-Q1
+    required:
+      - R_ILIM
+      - R_IPROPI
+      - C_VM_ACT
+      - C_VCP
+    description: "DRV8873 H-bridge support components"
+
+  U4:  # LMR33630
+    required:
+      - L4
+      - RFBT
+      - RFBB
+      - C_BOOT
+      - C_VCC
+      - C_CPLCPH
+      - CDVDT
+      - C4IN
+      - C4_1
+      - C4_2
+      - C4_3
+      - C4_4
+    description: "LMR33630 buck converter components"
+
+  U6:  # LM5069-1
+    required:
+      - RS_IN
+      - RUV_TOP
+      - RUV_BOT
+      - ROV_TOP
+      - ROV_BOT
+      - RPWR
+      - CDVDT_LM
+      - C_GATE
+      - Q_HS
+      - TVS1
+      - NT_PGND_LGND
+    description: "LM5069 hot-swap controller components"
+
+  U7:  # TPS22919
+    required:
+      - C_TPS22919_IN
+      - C_TPS22919_OUT
+    description: "TPS22919 load switch capacitors"
+
+  U8:  # TLV75533
+    required:
+      - C_TLV75533_IN
+      - C_TLV75533_OUT
+    description: "TLV75533 LDO capacitors"

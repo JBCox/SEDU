@@ -1,8 +1,21 @@
 Ref,Part Number,Qty,Description
+C19,GRM188R71C104KA01,1,100nF 16V X7R 0603 Button ladder RC filter capacitor | Debouncing cap at ladder node
+C4IN,GRM31CR71H106KA12,1,10uF 50V X7R 1206 LMR33630 input capacitor (10uF primary) (CRITICAL) | Parallel with 220nF ceramic for input decoupling
+C4_1,GRM21BR71A226ME44,1,"22uF 10V X7R 0805 LMR33630 output capacitor 1 of 4 (CRITICAL) | 3.3V output, 4× parallel for low ESR"
+C4_2,GRM21BR71A226ME44,1,22uF 10V X7R 0805 LMR33630 output capacitor 2 of 4 (CRITICAL)
+C4_3,GRM21BR71A226ME44,1,22uF 10V X7R 0805 LMR33630 output capacitor 3 of 4 (CRITICAL)
+C4_4,GRM21BR71A226ME44,1,22uF 10V X7R 0805 LMR33630 output capacitor 4 of 4 (CRITICAL)
 CDVDT,GRM188R71C333KA01,1,33nF 16V X7R 0603 LM5069 dV/dt control (limits inrush) (CRITICAL)
+CSN_U,GRM1885C1H472JA01,1,4.7nF 50V C0G 0603 Phase U RC snubber capacitor (DNI) | DNI unless EMI issues observed
+CSN_V,GRM1885C1H472JA01,1,4.7nF 50V C0G 0603 Phase V RC snubber capacitor (DNI)
+CSN_W,GRM1885C1H472JA01,1,4.7nF 50V C0G 0603 Phase W RC snubber capacitor (DNI)
+C_BAT_AA,GRM188R71C104KA01,1,100nF 16V X7R 0603 Battery ADC anti-alias capacitor (GPIO1) | Shunt to GND at GPIO1
 C_BOOT,GRM188R71H104KA93,1,100nF 50V X7R 0603 LMR33630 bootstrap capacitor (CRITICAL) [LMR33630 datasheet typical application (MANDATORY)]
 C_CHIP_PU,GRM188R71C105KA12,1,1uF 16V X7R 0603 ESP32 CHIP_PU RC delay (power sequencing) (CRITICAL) [Espressif Hardware Design Guidelines (MANDATORY)]
 C_CPLCPH,GRM188R72A473KA01,1,47nF 100V X7R 0603 DRV8353 charge pump capacitor (CRITICAL)
+C_CSA_U,GRM1885C1H471JA01,1,470pF 50V C0G 0603 CSA U shunt capacitor (GPIO5 anti-alias) | Shunt to GND at GPIO5
+C_CSA_V,GRM1885C1H471JA01,1,470pF 50V C0G 0603 CSA V shunt capacitor (GPIO6 anti-alias)
+C_CSA_W,GRM1885C1H471JA01,1,470pF 50V C0G 0603 CSA W shunt capacitor (GPIO7 anti-alias)
 C_DRV8353_VM1,GRM188R71H104KA93,1,100nF 50V X7R 0603 DRV8353 VM bypass capacitor (CRITICAL) [DRV8353RS datasheet Section 8.2.2 (MANDATORY)]
 C_DRV8353_VM2,C3216X7R1H226K,1,22uF 50V X7R 1206 DRV8353 VM bulk capacitor (CRITICAL) [DRV8353RS datasheet Section 8.2.2 (>=10uF MANDATORY)]
 C_DRV8353_VM3,C3216X7R1H226K,1,22uF 50V X7R 1206 DRV8353 VM additional bulk (margin) [DRV8353RS datasheet Section 8.2.2]
@@ -10,6 +23,7 @@ C_DRV8873_DVDD,GRM188R70J105KA01,1,1uF 6.3V X7R 0603 DRV8873 digital supply bypa
 C_DRV8873_VM1,GRM188R71H104KA93,1,100nF 50V X7R 0603 DRV8873 VM bypass capacitor (CRITICAL) [DRV8873 datasheet typical application (MANDATORY)]
 C_DRV8873_VM2,C3216X7R1V226K,1,22uF 35V X7R 1206 DRV8873 VM bulk capacitor (CRITICAL) [DRV8873 datasheet typical application (MANDATORY)]
 C_DVDD,GRM188R71C105KA12,1,1uF 16V X7R 0603 DRV8353 DVDD bypass (CRITICAL)
+C_IPROPI_AA,GRM188R71C103KA01,1,10nF 16V X7R 0603 IPROPI anti-alias capacitor (GPIO2) | Shunt to GND at GPIO2
 C_LM5069_VDD,GRM188R71C105KA12,1,1uF 16V X7R 0603 LM5069 VDD bypass (gate driver stability) [LM5069 datasheet typical application]
 C_TLV75533_IN,GRM188R70J105KA01,1,1uF 6.3V X7R 0603 TLV75533 input capacitor (CRITICAL) [TLV75533 datasheet (MANDATORY for stability)]
 C_TLV75533_OUT,GRM21BR70J106KE76,1,10uF 6.3V X7R 0805 TLV75533 output capacitor (CRITICAL) [TLV75533 datasheet (MANDATORY for stability)]
@@ -26,29 +40,79 @@ C_VDD_CPU,GRM188R71C104KA01,1,100nF 16V X7R 0603 ESP32 VDD3P3_CPU decoupling (pi
 C_VDD_RTC,GRM188R71C104KA01,1,100nF 16V X7R 0603 ESP32 VDD3P3_RTC decoupling (pin 20) (CRITICAL)
 C_VDD_SPI,GRM188R71C105KA12,1,1uF 16V X7R 0603 ESP32 VDD_SPI decoupling (CRITICAL)
 C_VGLS,GRM188R71C105KA12,1,1uF 16V X7R 0603 DRV8353 VGLS bypass (CRITICAL)
+ESDUSB,USBLC6-2SC6,1,"USBLC6-2SC6 SOT-23-6 USB D+/D- ESD protection array | 2-line ESD near USB-C connector, protects GPIO19/20"
+ESD_CC,TBD,1,"2-line ESD array SOT-23 USB-C CC line ESD protection (DNI) | CC1/CC2 ESD near USB-C connector, DNI unless required"
+ESD_UI,TBD,1,"4-line TVS array Array UI connector ESD protection (4-line) | Protects GPIO23/24 near J_UI, short GND return"
+FB_LED,BLM18PG601SN1D,1,"600ohm@100MHz 0603 LCD backlight ferrite bead (DNI) | LEDK series bead, DNI unless EMI issues"
 FB_VDDA,BLM18PG601SN1D,1,600R@100MHz 0603 ESP32 VDDA filter (improves ADC accuracy) (CRITICAL)
+J_ACT,43045-0200,1,MicroFit 3.0 2-pos MicroFit_3.0_1x02_P3.00mm_Vertical Actuator connector (CRITICAL) | 18 AWG minimum for 3.3A continuous
+J_BAT,43045-0200,1,"MicroFit 3.0 2-pos MicroFit_3.0_1x02_P3.00mm_Vertical Battery input connector (CRITICAL) | Requires 14 AWG wire minimum for 23A peak, crimp terminals 43030-0001"
+J_LCD,BM08B-GHS-TBT,1,"JST-GH 8-pos JST_GH_BM08B-GHS-TBT_1x08-1MP_P1.25mm_Vertical LCD daughterboard connector | Pinout: 3V3, GND, SCK, MOSI, CS_LCD, DC, RST, LEDK"
+J_MOT,43045-0300,1,MicroFit 3.0 3-pos MicroFit_3.0_1x03_P3.00mm_Vertical Motor 3-phase connector (U/V/W) (CRITICAL) | 14 AWG per phase for 20A peak
+J_UI,BM08B-GHS-TBT,1,"JST-GH 8-pos JST_GH_BM08B-GHS-TBT_1x08-1MP_P1.25mm_Vertical UI daughterboard connector | Pinout: 3V3, GND, BTN_SENSE, START, STOP, BUZZER, LED1, LED2"
 L4,SRP1265-100M,1,10uH 4A rated 1212 LMR33630 inductor (24V->3.3V) (CRITICAL)
+NT_PGND_LGND,NetTie,1,"0ohm trace NetTie_2 Power/logic ground star point tie (CRITICAL) | Star ground near LM5069 Kelvin sense, joins PGND and LGND"
+Q1,BSC016N06NS,1,"BSC016N06NS 60V 100 rated SuperSO8 Motor bridge high-side U MOSFET (CRITICAL) | 60V 100A SuperSO8, typical RDS(on) 1.6mΩ @ 10V VGS"
+Q2,BSC016N06NS,1,BSC016N06NS 60V 100 rated SuperSO8 Motor bridge low-side U MOSFET (CRITICAL)
+Q3,BSC016N06NS,1,BSC016N06NS 60V 100 rated SuperSO8 Motor bridge high-side V MOSFET (CRITICAL)
+Q4,BSC016N06NS,1,BSC016N06NS 60V 100 rated SuperSO8 Motor bridge low-side V MOSFET (CRITICAL)
+Q5,BSC016N06NS,1,BSC016N06NS 60V 100 rated SuperSO8 Motor bridge high-side W MOSFET (CRITICAL)
+Q6,BSC016N06NS,1,BSC016N06NS 60V 100 rated SuperSO8 Motor bridge low-side W MOSFET (CRITICAL)
+QREV,TBD,1,"P-FET 60V 60V 20 rated PowerPAK Reverse input protection MOSFET (optional) | Optional reverse polarity protection, alternative to diode"
+Q_HS,BSC040N08NS5,1,"BSC040N08NS5 60V 40 rated SuperSO8 LM5069 hot-swap pass FET (CRITICAL) | Hot-swap pass element, controlled by LM5069 GATE pin"
+Q_LED,2N7002,1,"N-FET SOT-23 30V 0.2 rated SOT-23 LCD backlight sink FET | Alternative to resistor-only backlight limit, PWM capable"
+R11,ERA-3AEB103V,1,"10kΩ 1% 0.1W 0603 Stop button leg (Normally Closed) | NC button, critical for safety"
+R19,ERA-3AEB103V,1,10kΩ 1% 0.1W 0603 Button ladder pull-up resistor | Main 3.3V pull-up for ladder network
+R20,ERA-3AEB104V,1,100kΩ 1% 0.1W 0603 Button ladder auxiliary pull-up
+R21,ERA-3AEB512V,1,5.1kΩ 1% 0.1W 0603 Start button leg (Normally Open)
 RFBB,ERA-3AEB4322V,1,43.2kΩ 1% 0.1W 0603 LMR33630 feedback bottom resistor (CRITICAL) | Calc: For 3.3V output with 0.8V ref
 RFBT,ERA-3AEB104V,1,100kΩ 1% 0.1W 0603 LMR33630 feedback top resistor (CRITICAL) | Calc: V_out = 0.8V * (1 + RFBT/RFBB)
+RG_U_HS,RC0603FR-0710RL,1,"10R 5% 0.125W 0603 Gate resistor high-side U | Place at MOSFET gate, ±2mm matching requirement"
+RG_U_LS,RC0603FR-0710RL,1,10R 5% 0.125W 0603 Gate resistor low-side U
+RG_V_HS,RC0603FR-0710RL,1,10R 5% 0.125W 0603 Gate resistor high-side V
+RG_V_LS,RC0603FR-0710RL,1,10R 5% 0.125W 0603 Gate resistor low-side V
+RG_W_HS,RC0603FR-0710RL,1,10R 5% 0.125W 0603 Gate resistor high-side W
+RG_W_LS,RC0603FR-0710RL,1,10R 5% 0.125W 0603 Gate resistor low-side W
 ROV_BOT,ERA-3AEB1002V,1,10kΩ 1% 0.1W 0603 LM5069 OV divider bottom (CRITICAL)
 ROV_TOP,ERA-3AEB2213V,1,221kΩ 1% 0.1W 0603 LM5069 OV divider top (sets 27V OV threshold) (CRITICAL)
 RPWR,ERA-3AEB1582V,1,15.8kΩ 1% 0.1W 0603 LM5069 power limit resistor [LM5069 datasheet typical application]
+RSN_U,RC0603FR-0710RL,1,"10R 5% 0.1W 0603 Phase U RC snubber resistor (DNI) | DNI unless EMI issues observed, U→PGND snubber series"
+RSN_V,RC0603FR-0710RL,1,10R 5% 0.1W 0603 Phase V RC snubber resistor (DNI)
+RSN_W,RC0603FR-0710RL,1,10R 5% 0.1W 0603 Phase W RC snubber resistor (DNI)
 RS_IN,WSLP2728L003F3A,1,3.0mΩ 1% 5W 2728 LM5069 current sense resistor (CRITICAL) [LM5069 datasheet Section 8.2.1] | Replaces CSS2H-2728R-L003F (old part not available at distributors) | Calc: ILIM = 55mV / 3.0mΩ = 18.3A
 RS_U,CSS2H-2512K-2L00F,1,"2.0mΩ 1% 5W 2512 Motor phase U current sense (Kelvin sense) (CRITICAL) | K suffix = 5W rating (R suffix = 3W, insufficient) | Calc: 25A peak: P = I²R = 625*0.002 = 1.25W (5W rated, 300% margin)"
 RS_V,CSS2H-2512K-2L00F,1,"2.0mΩ 1% 5W 2512 Motor phase V current sense (Kelvin sense) (CRITICAL) | Calc: 25A peak: P = I²R = 625*0.002 = 1.25W (5W rated, 300% margin)"
 RS_W,CSS2H-2512K-2L00F,1,"2.0mΩ 1% 5W 2512 Motor phase W current sense (Kelvin sense) (CRITICAL) | Calc: 25A peak: P = I²R = 625*0.002 = 1.25W (5W rated, 300% margin)"
 RUV_BOT,ERA-3AEB1002V,1,10kΩ 1% 0.1W 0603 LM5069 UV divider bottom (CRITICAL)
 RUV_TOP,ERA-3AEB1403V,1,140kΩ 1% 0.1W 0603 LM5069 UV divider top (sets 18V UV threshold) (CRITICAL)
+R_BAT_SER,ERA-3AEB102V,1,"1kΩ 1% 0.1W 0603 Battery ADC series resistor (GPIO1 protection) | Series at GPIO1 ADC1_CH0, forms RC filter with C_BAT_AA"
+R_BTN_SER,RC0603FR-07100RL,1,"100R 5% 0.1W 0603 Button ladder series resistor (GPIO4 protection) | Series at GPIO4 ADC1_CH3, between ladder and MCU"
+R_CC1,RC0603FR-075K1L,1,"5.1kΩ 5% 0.1W 0603 USB-C CC1 pulldown resistor | UFP CC1 pulldown to GND, identifies as USB device"
+R_CC2,RC0603FR-075K1L,1,5.1kΩ 5% 0.1W 0603 USB-C CC2 pulldown resistor | UFP CC2 pulldown to GND
 R_CHIP_PU,ERA-3AEB103V,1,10kΩ 1% 0.1W 0603 ESP32 CHIP_PU pull-up (ensures reliable boot) (CRITICAL) [Espressif Hardware Design Guidelines (MANDATORY)]
+R_CSA_U,RC0603FR-0756RL,1,"56R 5% 0.1W 0603 CSA U series resistor (GPIO5 anti-alias) | Series at GPIO5 ADC input, forms RC filter with C_CSA_U"
+R_CSA_V,RC0603FR-0756RL,1,56R 5% 0.1W 0603 CSA V series resistor (GPIO6 anti-alias)
+R_CSA_W,RC0603FR-0756RL,1,56R 5% 0.1W 0603 CSA W series resistor (GPIO7 anti-alias)
 R_DRV8353_nFAULT,ERA-3AEB103V,1,10kΩ 1% 0.1W 0603 DRV8353 nFAULT pull-up (open-drain output)
 R_DRV8873_nFAULT,ERA-3AEB103V,1,10kΩ 1% 0.1W 0603 DRV8873 nFAULT pull-up (open-drain output)
 R_ILIM,ERA-3AEB1581V,1,1.58kΩ 1% 0.1W 0603 DRV8873 current limit setting (CRITICAL) [DRV8873 datasheet Section 8.2.2.2] | Calc: ILIM = 5200V / 1.58kΩ = 3.29A
 R_IPROPI,ERA-3AEB102V,1,1.00kΩ 1% 0.1W 0603 DRV8873 IPROPI scaling (CRITICAL) [DRV8873 datasheet Section 8.2.2.3] | Calc: V_IPROPI = (I_LOAD / 1100) * R_IPROPI
+R_IPROPI_SER,RC0603FR-07100RL,1,100R 5% 0.1W 0603 IPROPI series resistor (GPIO2 protection) | Series at GPIO2 ADC1_CH1
 R_LEDK,RC0603FR-07150RL,1,150R 1% 0.1W 0603 LCD backlight current limit (CRITICAL) | CRITICAL: prevents LED overcurrent | Calc: (3.3V - 1.3V) / 150Ω ≈ 13mA
 R_MOSI,RC0603FR-0722RL,1,22R 5% 0.1W 0603 LCD MOSI series resistor (signal integrity)
 R_PGD_PU,ERA-3AEB104V,1,100kΩ 1% 0.1W 0603 LM5069 PGD pull-up (open-drain output)
 R_SCK,RC0603FR-0722RL,1,22R 5% 0.1W 0603 LCD SCK series resistor (signal integrity)
+R_START_SER,RC0603FR-07100RL,1,100R 5% 0.1W 0603 Start digital input series resistor | Series at GPIO23 protection near J_UI
+R_STOP_SER,RC0603FR-07100RL,1,100R 5% 0.1W 0603 Stop digital input series resistor | Series at GPIO24 protection near J_UI
 R_USB_DM,RC0603FR-0722RL,1,22R 5% 0.1W 0603 USB D- series resistor (signal integrity)
 R_USB_DP,RC0603FR-0722RL,1,22R 5% 0.1W 0603 USB D+ series resistor (signal integrity)
 R_VBAT_BOT,ERA-3AEB1002V,1,10kΩ 1% 0.1W 0603 Battery voltage divider bottom (CRITICAL)
 R_VBAT_TOP,ERA-3AEB1403V,1,140kΩ 1% 0.1W 0603 Battery voltage divider top (ADC1_CH0) (CRITICAL) | Calc: 25.2V max -> 1.68V at ADC (within 3.5V range)
+TP_24V,5000,1,Keystone 5000 TestPoint Protected 24V rail test point (VBAT_PROT)
+TP_3V3,5000,1,Keystone 5000 TestPoint 3.3V rail test point
+TP_BTN,5000,1,Keystone 5000 TestPoint Button sense voltage test point
+TP_IPROPI,5000,1,Keystone 5000 TestPoint Actuator IPROPI test point
+TP_RX,5000,1,Keystone 5000 TestPoint UART RX debug test point
+TP_TX,5000,1,Keystone 5000 TestPoint UART TX debug test point
+TVS1,SMBJ33A,1,"SMBJ33A 33V DO-214AA Battery input surge clamp (CRITICAL) | 33V standoff, typical clamp 53.3V @ 1A"
+TVS2,SMBJ33A,1,SMBJ33A 33V DO-214AA Actuator supply surge clamp
