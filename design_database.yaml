@@ -1719,38 +1719,27 @@ verification_rules:
 # ==============================================================================
 # BUTTON LADDER VOLTAGE BANDS
 # ==============================================================================
+# LOCKED VALUES (must match firmware/src/input_ladder.cpp and SSOT)
+# Source: docs/SEDU_Single_PCB_Parity_Corrected_RevC4a_Final.md
+# "Ladder voltage bands: <0.20 V fault, 0.75–1.00 V START, 1.55–2.10 V IDLE, 2.60–3.35 V STOP, >3.40 V fault"
 button_ladder:
   pull_up: 10000      # R19: 10kΩ to 3.3V
   aux_pull_up: 100000 # R20: 100kΩ auxiliary
+  fault_low_threshold: 0.20   # Voltages below this are fault
+  fault_high_threshold: 3.40  # Voltages above this are fault
   bands:
-    IDLE:
-      voltage_min: 3.20
-      voltage_max: 3.35
-      description: "No button pressed (pull-up voltage)"
     START:
-      voltage_min: 1.50
-      voltage_max: 1.70
-      description: "Start button (R21 = 5.1kΩ)"
-    STOP:
-      voltage_min: 2.80
-      voltage_max: 3.00
-      description: "Stop button NC (R11 = 10kΩ)"
-    F1:
-      voltage_min: 0.80
+      voltage_min: 0.75
       voltage_max: 1.00
-      description: "Function 1 button"
-    F2:
-      voltage_min: 0.40
-      voltage_max: 0.60
-      description: "Function 2 button"
-    F3:
-      voltage_min: 0.10
-      voltage_max: 0.30
-      description: "Function 3 button"
-    FAULT:
-      voltage_min: 0.00
-      voltage_max: 0.05
-      description: "Ladder short or fault"
+      description: "Start button (R21 = 5.1kΩ)"
+    IDLE:
+      voltage_min: 1.55
+      voltage_max: 2.10
+      description: "No button pressed (pull-up voltage)"
+    STOP:
+      voltage_min: 2.60
+      voltage_max: 3.35
+      description: "Stop button NC (R11 = 10kΩ)"
 
 # ==============================================================================
 # BANNED COMPONENTS (5V Rail Elimination)

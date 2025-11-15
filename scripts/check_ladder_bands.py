@@ -1,46 +1,86 @@
 #!/usr/bin/env python3
 """
-Verify ladder voltage bands are consistent between the SSOT doc and firmware constants.
+Verify ladder voltage bands are consistent between database and firmware (Database-Driven).
+
+UPDATED: Now reads authoritative values from design_database.yaml
 
 Checks:
-- Parse bands from docs/SEDU_Single_PCB_Parity_Corrected_RevC4a_Final.md
-- Parse constants from firmware/src/input_ladder.cpp
-- Assert values match within a small tolerance
-- Assert ordering and gap structure are as expected
+1. Database defines button_ladder with fault thresholds and bands
+2. Firmware constants match database values
+3. Ordering and gap structure are correct
+4. Monotonic increasing voltage bands
+
+Exit codes: 0 OK, 1 violations found
 """
 from __future__ import annotations
 
 import pathlib
 import re
 import sys
+import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-SSOT = ROOT / "docs" / "SEDU_Single_PCB_Parity_Corrected_RevC4a_Final.md"
+DATABASE = ROOT / "design_database.yaml"
 FW = ROOT / "firmware" / "src" / "input_ladder.cpp"
 
 
-def parse_ssot(path: pathlib.Path):
-    text = path.read_text(encoding="utf-8", errors="ignore")
-    # Find the ladder bands row
-    # Example: Ladder voltage bands: <0.20 V fault, 0.75–1.00 V START, 1.55–2.10 V IDLE, 2.60–3.35 V STOP, >3.40 V fault.
-    m = re.search(r"Ladder voltage bands:\s*<([0-9.]+)\s*V.*?([0-9.]+)[–-]([0-9.]+)\s*V\s*START,\s*([0-9.]+)[–-]([0-9.]+)\s*V\s*IDLE,\s*([0-9.]+)[–-]([0-9.]+)\s*V\s*STOP,\s*>\s*([0-9.]+)\s*V",
-                  text, re.IGNORECASE | re.DOTALL)
-    if not m:
-        raise SystemExit("[ladder_bands] Could not parse ladder band row from SSOT")
-    fault_low, start_min, start_max, idle_min, idle_max, stop_min, stop_max, fault_high = map(float, m.groups())
-    return {
-        "fault_low": fault_low,
-        "start_min": start_min,
-        "start_max": start_max,
-        "idle_min": idle_min,
-        "idle_max": idle_max,
-        "stop_min": stop_min,
-        "stop_max": stop_max,
-        "fault_high": fault_high,
+def load_database():
+    """Load design database from YAML."""
+    if not DATABASE.exists():
+        print(f"[ladder_bands] ERROR: Database not found: {DATABASE}")
+        sys.exit(1)
+
+    try:
+        with open(DATABASE, 'r', encoding='utf-8') as f:
+            return yaml.safe_load(f)
+    except yaml.YAMLError as e:
+        print(f"[ladder_bands] ERROR: Failed to parse database: {e}")
+        sys.exit(1)
+
+
+def parse_database_ladder(db):
+    """Extract ladder band values from database.
+
+    Returns dict with keys: fault_low, start_min, start_max, idle_min,
+    idle_max, stop_min, stop_max, fault_high
+    """
+    ladder = db.get('button_ladder', {})
+
+    if not ladder:
+        print("[ladder_bands] ERROR: No button_ladder section in database")
+        sys.exit(1)
+
+    bands = ladder.get('bands', {})
+
+    # Extract values
+    values = {
+        "fault_low": ladder.get('fault_low_threshold'),
+        "fault_high": ladder.get('fault_high_threshold'),
     }
+
+    # Extract band min/max values
+    for band_name in ['START', 'IDLE', 'STOP']:
+        band = bands.get(band_name, {})
+        if not band:
+            print(f"[ladder_bands] ERROR: Band {band_name} not found in database")
+            sys.exit(1)
+
+        key_min = band_name.lower() + "_min"
+        key_max = band_name.lower() + "_max"
+        values[key_min] = band.get('voltage_min')
+        values[key_max] = band.get('voltage_max')
+
+    # Validate all values exist
+    for key, val in values.items():
+        if val is None:
+            print(f"[ladder_bands] ERROR: Missing value for {key} in database")
+            sys.exit(1)
+
+    return values
 
 
 def parse_fw(path: pathlib.Path):
+    """Parse firmware ladder constants."""
     text = path.read_text(encoding="utf-8", errors="ignore")
     vals = {}
     for name in (
@@ -70,13 +110,27 @@ def parse_fw(path: pathlib.Path):
 
 
 def approx_equal(a: float, b: float, tol: float = 0.02) -> bool:
+    """Check if two values are approximately equal within tolerance."""
     return abs(a - b) <= tol
 
 
 def main():
-    ssot = parse_ssot(SSOT)
+    # Load database (authoritative source)
+    db = load_database()
+    db_ladder = parse_database_ladder(db)
+
+    # Parse firmware constants
     fw = parse_fw(FW)
 
+    print("[ladder_bands] Database ladder values:")
+    print(f"  Fault low:  < {db_ladder['fault_low']:.2f} V")
+    print(f"  START:      {db_ladder['start_min']:.2f} - {db_ladder['start_max']:.2f} V")
+    print(f"  IDLE:       {db_ladder['idle_min']:.2f} - {db_ladder['idle_max']:.2f} V")
+    print(f"  STOP:       {db_ladder['stop_min']:.2f} - {db_ladder['stop_max']:.2f} V")
+    print(f"  Fault high: > {db_ladder['fault_high']:.2f} V")
+    print()
+
+    # Compare database vs firmware
     keys = [
         ("fault_low", "FaultLow"),
         ("start_min", "StartMin"),
@@ -87,46 +141,84 @@ def main():
         ("stop_max", "StopMax"),
         ("fault_high", "FaultHigh"),
     ]
+
     ok = True
+    mismatches = []
+
     for k, label in keys:
-        if not approx_equal(ssot[k], fw[k]):
-            print(f"[ladder_bands] {label} mismatch: SSOT={ssot[k]:.2f} V, FW={fw[k]:.2f} V")
+        if not approx_equal(db_ladder[k], fw[k]):
+            mismatch = f"  {label}: Database={db_ladder[k]:.2f} V, Firmware={fw[k]:.2f} V"
+            mismatches.append(mismatch)
             ok = False
+
+    if mismatches:
+        print("[ladder_bands] FAIL: Database vs Firmware mismatch:")
+        for m in mismatches:
+            print(m)
+        print()
+    else:
+        print("[ladder_bands] OK: Database matches firmware (±0.02V tolerance)")
+        print()
 
     # Ordering checks (expected monotonic increasing)
     seq = [
-        ("fault_low", ssot["fault_low"]),
-        ("start_min", ssot["start_min"]),
-        ("start_max", ssot["start_max"]),
-        ("idle_min", ssot["idle_min"]),
-        ("idle_max", ssot["idle_max"]),
-        ("stop_min", ssot["stop_min"]),
-        ("stop_max", ssot["stop_max"]),
-        ("fault_high", ssot["fault_high"]),
+        ("fault_low", db_ladder["fault_low"]),
+        ("start_min", db_ladder["start_min"]),
+        ("start_max", db_ladder["start_max"]),
+        ("idle_min", db_ladder["idle_min"]),
+        ("idle_max", db_ladder["idle_max"]),
+        ("stop_min", db_ladder["stop_min"]),
+        ("stop_max", db_ladder["stop_max"]),
+        ("fault_high", db_ladder["fault_high"]),
     ]
+
+    ordering_ok = True
     for idx, ((ka, va), (kb, vb)) in enumerate(zip(seq, seq[1:])):
         # Allow equality only for stop_max <= fault_high (inclusive STOP window, fault above)
         if ka == "stop_max" and kb == "fault_high":
             if not (va <= vb):
-                print(f"[ladder_bands] Expected {ka} <= {kb}, got {va} !<= {vb}")
-                ok = False
+                print(f"[ladder_bands] FAIL: Expected {ka} <= {kb}, got {va:.2f} !<= {vb:.2f}")
+                ordering_ok = False
             continue
         if not (va < vb):
-            print(f"[ladder_bands] Expected {ka} < {kb}, got {va} !< {vb}")
-            ok = False
+            print(f"[ladder_bands] FAIL: Expected {ka} < {kb}, got {va:.2f} !< {vb:.2f}")
+            ordering_ok = False
+
+    if not ordering_ok:
+        ok = False
+    else:
+        print("[ladder_bands] OK: Voltage bands are monotonically increasing")
+        print()
 
     # Gap checks: only two gaps: (start_max, idle_min) and (idle_max, stop_min)
     gaps = [
-        (ssot["start_max"], ssot["idle_min"]),
-        (ssot["idle_max"], ssot["stop_min"]),
+        (db_ladder["start_max"], db_ladder["idle_min"]),
+        (db_ladder["idle_max"], db_ladder["stop_min"]),
     ]
-    if not (gaps[0][1] > gaps[0][0] and gaps[1][1] > gaps[1][0]):
-        print("[ladder_bands] Unexpected gap configuration")
+
+    gap_ok = True
+    if not (gaps[0][1] > gaps[0][0]):
+        print(f"[ladder_bands] FAIL: No gap between START and IDLE: {gaps[0][0]:.2f} >= {gaps[0][1]:.2f}")
+        gap_ok = False
+
+    if not (gaps[1][1] > gaps[1][0]):
+        print(f"[ladder_bands] FAIL: No gap between IDLE and STOP: {gaps[1][0]:.2f} >= {gaps[1][1]:.2f}")
+        gap_ok = False
+
+    if gap_ok:
+        gap1_size = gaps[0][1] - gaps[0][0]
+        gap2_size = gaps[1][1] - gaps[1][0]
+        print(f"[ladder_bands] OK: Gap between START and IDLE: {gap1_size:.2f} V")
+        print(f"[ladder_bands] OK: Gap between IDLE and STOP: {gap2_size:.2f} V")
+        print()
+    else:
         ok = False
 
     if not ok:
+        print("[ladder_bands] FAIL: Ladder band verification failed")
         raise SystemExit(1)
-    print("[ladder_bands] SSOT <-> firmware ladder bands: OK")
+
+    print("[ladder_bands] PASS: Database <-> firmware ladder bands consistent")
 
 
 if __name__ == "__main__":
@@ -136,4 +228,6 @@ if __name__ == "__main__":
         raise
     except Exception as e:
         print(f"[ladder_bands] ERROR: {e}")
+        import traceback
+        traceback.print_exc()
         sys.exit(2)
