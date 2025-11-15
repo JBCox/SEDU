@@ -85,7 +85,10 @@ python scripts/check_5v_elimination.py
 # 8. Button ladder verification
 python scripts/check_ladder_bands.py
 
-# 9. Frozen state violations (CRITICAL - prevents old values from creeping back)
+# 9. BOM completeness verification (CRITICAL - ensures all datasheet-required components present)
+python scripts/check_bom_completeness.py
+
+# 10. Frozen state violations (CRITICAL - prevents old values from creeping back)
 python scripts/check_frozen_state_violations.py
 
 # Optional:

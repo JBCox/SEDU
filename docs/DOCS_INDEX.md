@@ -7,6 +7,12 @@
 - `Datasheet_Notes.md` — distilled notes from vendor datasheets.
 - `Component_Report.md` — per-IC project roles and locked values.
 - `Original_Schematic_Translation.md` — legacy harness translation and behavior.
+- `FROZEN_STATE_REV_C4b.md` — authoritative frozen design state document (Rev C.4b).
+- `MANDATORY_PREFAB_CHECKLIST.md` — 10-section pre-fabrication verification checklist.
+- `80x50mm_BOARD_VERIFICATION_SUMMARY.md` — board size optimization verification (optimized from 75×55mm to 80×50mm).
+- `CLEAN_SWEEP_FINAL_STATUS.md` — systematic cleanup report (2025-11-12).
+- `DEEP_VERIFICATION_REPORT.md` — datasheet-driven ground truth verification.
+- `FINAL_MULTI_AGENT_VERIFICATION_REPORT.md` — 4 parallel agent comprehensive verification.
 - `docs/DOCS_INDEX.md` — this file; single index of artifacts.
 - `docs/BRINGUP_CHECKLIST.md` — step-by-step bring-up instructions.
 - `docs/archive/CHANGELOG.md` — running change log (if present).
